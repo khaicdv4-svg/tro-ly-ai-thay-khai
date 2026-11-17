@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Không Gian Làm Việc & Trợ Lý AI Hybrid - Thầy Khái (v10.1)</title>
+  <title>Không Gian Làm Việc & Trợ Lý AI Hybrid - Thầy Khái (v10.4)</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
@@ -34,7 +34,7 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-sm sm:text-base font-bold leading-tight">Không Gian Làm Việc & Trợ Lý AI Hybrid</h1>
-          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold">v10.1 Chuẩn</span>
+          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold">v10.4 Chuẩn</span>
         </div>
         <p class="text-[11px] text-blue-200 hidden sm:block">Quản lý 22 liên kết • Tự động phát bài học & Chuyển mục 5 → 6 • Gemini 3.8 Flash</p>
       </div>
@@ -84,7 +84,7 @@
         <div class="flex flex-wrap items-center gap-2">
           <span id="extBridgeDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
           <span class="text-xs font-bold text-emerald-300">Điều khiển Bài học (Mục 5 → 6):</span>
-          <span id="extBridgeBadge" class="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded-md">Đang chờ nạp Extension v10.1...</span>
+          <span id="extBridgeBadge" class="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded-md">Đang chờ nạp Extension v10.4...</span>
         </div>
         <div class="flex flex-wrap items-center gap-1.5">
           <button id="btnAutoPlayLesson" type="button" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
@@ -189,6 +189,9 @@
                   class="quick-prompt-btn text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
             <i class="fa-solid fa-pen-nib mr-1"></i>Nhận xét HS
           </button>
+          <button id="voiceReplyToggleBtn" type="button" class="text-[11px] bg-emerald-600 text-white border border-emerald-600 px-2 py-1 rounded transition font-medium" title="Bật/tắt AI đọc to câu trả lời bằng tiếng Việt">
+            <i class="fa-solid fa-volume-high mr-1"></i>Đọc thoại: Bật
+          </button>
           <button id="clearChatBtn" type="button" class="ml-auto text-[11px] text-slate-400 hover:text-slate-600 px-1.5" title="Làm mới chat">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
@@ -196,18 +199,21 @@
 
         <div id="chatBox" class="flex-1 p-3.5 overflow-y-auto custom-scrollbar space-y-3 bg-slate-50/40">
           <div class="bg-blue-50 border border-blue-100 text-slate-700 p-3 rounded-xl text-xs leading-relaxed">
-            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Bản v10.1 đã sửa lỗi Model API & Kết nối điều khiển!</p>
+            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Bản v10.4 đã sửa lỗi Model API & Kết nối điều khiển!</p>
             <ul class="list-disc pl-4 space-y-1">
               <li><strong>Điền API Key ngay trên giao diện:</strong> Bấm nút màu cam <strong>"Điền API Key"</strong> ở góc trên bên phải để nhập khóa Gemini của thầy.</li>
-              <li><strong>Tự động phát bài học & chuyển mục 5 → 6:</strong> Dùng thanh điều khiển màu đen ở trên cùng bên trái (tự đồng bộ với cả Chrome Extension v10.1 và Python Playwright).</li>
+              <li><strong>Tự động phát bài học & chuyển mục 5 → 6:</strong> Dùng thanh điều khiển màu đen ở trên cùng bên trái (tự đồng bộ với cả Chrome Extension v10.4 và Python Playwright).</li>
             </ul>
           </div>
         </div>
 
         <div class="p-2.5 border-t border-slate-200 bg-white shrink-0">
-          <form id="chatForm" class="flex gap-2">
+          <form id="chatForm" class="flex gap-1.5 items-stretch">
+            <button id="voiceMicBtn" type="button" class="bg-slate-100 hover:bg-rose-100 text-slate-700 border border-slate-300 px-3 rounded-lg text-sm transition flex items-center justify-center" title="Nói lệnh bằng giọng nói tiếng Việt">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
             <textarea id="agentInput" rows="2" 
-                      placeholder="Gõ lệnh mở trang, chuyển sang mục 6, hoặc dán câu hỏi trắc nghiệm vào đây... (Enter để gửi)" 
+                      placeholder="Nói hoặc gõ lệnh (mở trang, mở clip, qua bài, giải bài tập...) - Enter để gửi" 
                       class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"></textarea>
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 rounded-lg text-sm font-medium transition flex items-center justify-center">
               <i class="fa-solid fa-paper-plane"></i>
@@ -441,16 +447,19 @@
       }
     }, 1500);
 
-    // Gửi lệnh tới cả Chrome Extension v10.1 và Python Hybrid Server (nếu đang chạy cùng nguồn)
+    // Gửi lệnh tới cả Chrome Extension v10.4 và Python Hybrid Server (nếu đang chạy cùng nguồn)
     async function dispatchHybridAction(action, target = '', url = '') {
       if (action === 'START_AUTO') sendToExtensionFrame('START_AUTO_VIDEO');
       if (action === 'STOP_AUTO') sendToExtensionFrame('STOP_AUTO_VIDEO');
       if (action === 'NEXT_SECTION') sendToExtensionFrame('CLICK_ELEMENT', 'Tiếp theo');
       if (action === 'CLICK_TEXT') sendToExtensionFrame('CLICK_ELEMENT', target);
 
-      if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+      if (window.location.protocol.startsWith('http')) {
+        const apiBase = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+          ? ''
+          : 'http://127.0.0.1:8765';
         try {
-          const res = await fetch('/api/action', {
+          const res = await fetch(apiBase + '/api/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -507,7 +516,7 @@
       ta.remove();
     }
 
-    // Lắng nghe tín hiệu kết nối và dữ liệu câu hỏi từ Extension v10.1 gửi về
+    // Lắng nghe tín hiệu kết nối và dữ liệu câu hỏi từ Extension v10.4 gửi về
     window.addEventListener("message", async (event) => {
       if (!event.data || event.data.source !== "THAYKHAI_EXTENSION_RESPONSE") return;
       if (event.data.action === "EXTENSION_HEARTBEAT") {
@@ -951,13 +960,16 @@ Yêu cầu:
       input.value = '';
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Xử lý nhanh lệnh mở clip học / phát video hoặc chuyển mục 5 -> 6 ngay lập tức
+      // Xử lý nhanh lệnh bằng lời thoại hoặc chữ
       if (/mở clip|phát video|bật video|tự học|chạy video/i.test(text)) {
         if (!isAutoPlayOn) toggleAutoPlayLesson();
         else dispatchHybridAction('START_AUTO');
       }
-      if (/mục\s*6|tiếp theo|qua bài|chuyển mục/i.test(text)) {
+      if (/mục\s*6|tiếp theo|qua bài|chuyển mục|chuyển clip/i.test(text)) {
         dispatchHybridAction('NEXT_SECTION');
+      }
+      if (/giải bài|làm bài|trả lời câu hỏi|trắc nghiệm/i.test(text) && text.length < 80) {
+        dispatchHybridAction('SOLVE_QUIZ', text);
       }
 
       const loadingId = 'loading-' + Date.now();
@@ -982,7 +994,9 @@ Nhiệm vụ điều hướng:
 2. Nếu thầy yêu cầu "mở thẻ mới", "mở tab ngoài": Chèn lệnh:
 [OPEN_NEW_TAB:{"title":"Tên trang","url":"https://..."}]
 3. Nếu thầy yêu cầu bấm vào một THẺ (Tab), nút bấm, hoặc mục bài học cụ thể (VD: "mở mục 6", "bấm Tiếp theo", "mở thẻ Học tập"): Chèn lệnh:
-[CLICK_ELEMENT:"Tên thẻ hoặc mục cần bấm"]`;
+[CLICK_ELEMENT:"Tên thẻ hoặc mục cần bấm"]
+4. Nếu thầy yêu cầu AI tự thao tác phức tạp trên bất kỳ trang web nào (VD: "đăng nhập", "nộp giáo án", "tìm và điền thông tin", "làm bài tập"): Chèn lệnh để Browser Use thực thi:
+[BROWSER_TASK:"Mô tả chi tiết thao tác cần làm trên trình duyệt"]`;
 
       const model = safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash');
 
@@ -1028,11 +1042,25 @@ Nhiệm vụ điều hướng:
           dispatchHybridAction('CLICK_TEXT', targetName);
         }
 
+        const browserTaskMatch = replyText.match(/\[BROWSER_TASK:"(.*?)"\]/);
+        if (browserTaskMatch) {
+          const taskDesc = browserTaskMatch[1];
+          replyText = replyText.replace(browserTaskMatch[0], '').trim();
+          dispatchHybridAction('AI_TASK', taskDesc).then((res) => {
+            if (res && res.message) {
+              chatBox.innerHTML += `<div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-slate-800 shadow-xs">${marked.parse(res.message)}</div>`;
+              chatBox.scrollTop = chatBox.scrollHeight;
+              speakVietnamese(res.message);
+            }
+          });
+        }
+
         chatBox.innerHTML += `
           <div class="bg-white border border-slate-200 p-3 rounded-xl text-xs text-slate-700 shadow-xs prose max-w-none leading-relaxed">
             ${marked.parse(replyText)}
           </div>
         `;
+        speakVietnamese(replyText);
       } catch (error) {
         document.getElementById(loadingId)?.remove();
         chatBox.innerHTML += `
@@ -1069,9 +1097,17 @@ Nhiệm vụ điều hướng:
     document.getElementById('closeSkillBannerBtn').addEventListener('click', () => {
       document.getElementById('wsSkillBanner').classList.add('hidden');
     });
-    document.getElementById('solveQuizOnPageBtn').addEventListener('click', () => {
-      sendToExtensionFrame('READ_PAGE_CONTENT');
-      showToast('Đang quét câu hỏi trên trang để giải...');
+    document.getElementById('solveQuizOnPageBtn').addEventListener('click', async () => {
+      showToast('Đang nhờ Browser Use đọc và giải bài tập trên Chrome...');
+      const res = await dispatchHybridAction('SOLVE_QUIZ', 'Giải bài tập trên trang hiện tại');
+      if (res && res.message) {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-slate-800 shadow-xs">${marked.parse(res.message)}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        speakVietnamese(res.message);
+      } else {
+        sendToExtensionFrame('READ_PAGE_CONTENT');
+      }
     });
 
     document.getElementById('timerToggleBtn').addEventListener('click', toggleTimer);
@@ -1161,6 +1197,80 @@ Nhiệm vụ điều hướng:
     checkApiStatus();
     renderLinks();
     renderTasks();
+
+    // === HỆ THỐNG TRÒ CHUYỆN & RA LỆNH BẰNG LỜI THOẠI TIẾNG VIỆT ===
+    let voiceReplyEnabled = true;
+    let recognition = null;
+    let isListening = false;
+
+    function speakVietnamese(text) {
+      if (!voiceReplyEnabled || !('speechSynthesis' in window) || !text) return;
+      try {
+        window.speechSynthesis.cancel();
+        const clean = text
+          .replace(/\[.*?\]/g, ' ')
+          .replace(/[*_`#>]/g, ' ')
+          .replace(/https?:\/\/\S+/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 450);
+        if (!clean) return;
+        const utter = new SpeechSynthesisUtterance(clean);
+        utter.lang = 'vi-VN';
+        utter.rate = 1.05;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {}
+    }
+
+    document.getElementById('voiceReplyToggleBtn').addEventListener('click', () => {
+      voiceReplyEnabled = !voiceReplyEnabled;
+      const btn = document.getElementById('voiceReplyToggleBtn');
+      if (voiceReplyEnabled) {
+        btn.className = "text-[11px] bg-emerald-600 text-white border border-emerald-600 px-2 py-1 rounded transition font-medium";
+        btn.innerHTML = '<i class="fa-solid fa-volume-high mr-1"></i>Đọc thoại: Bật';
+      } else {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        btn.className = "text-[11px] bg-white text-slate-600 border border-slate-300 px-2 py-1 rounded transition font-medium";
+        btn.innerHTML = '<i class="fa-solid fa-volume-xmark mr-1"></i>Đọc thoại: Tắt';
+      }
+    });
+
+    document.getElementById('voiceMicBtn').addEventListener('click', () => {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        showToast('Trình duyệt này chưa hỗ trợ nhận diện giọng nói. Thầy hãy dùng Google Chrome nhé!');
+        return;
+      }
+      const micBtn = document.getElementById('voiceMicBtn');
+      if (isListening && recognition) {
+        recognition.stop();
+        return;
+      }
+      recognition = new SpeechRec();
+      recognition.lang = 'vi-VN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        isListening = true;
+        micBtn.className = "bg-rose-600 text-white border border-rose-600 px-3 rounded-lg text-sm transition flex items-center justify-center animate-pulse";
+        showToast('Đang nghe lệnh tiếng Việt của thầy...');
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('agentInput').value = transcript;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      };
+      recognition.onerror = () => {
+        showToast('Không nghe rõ giọng nói, thầy bấm micro thử lại nhé!');
+      };
+      recognition.onend = () => {
+        isListening = false;
+        micBtn.className = "bg-slate-100 hover:bg-rose-100 text-slate-700 border border-slate-300 px-3 rounded-lg text-sm transition flex items-center justify-center";
+      };
+      recognition.start();
+    });
+
   </script>
 </body>
 </html>
