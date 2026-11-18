@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Không Gian Làm Việc Khép Kín & AI Agent - Thầy Khái (v13.0)</title>
+  <title>Không Gian Làm Việc Khép Kín & AI Agent - Thầy Khái (v13.1)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -27,7 +27,7 @@
       <div class="truncate">
         <div class="flex items-center gap-2">
           <h1 class="text-sm sm:text-base font-bold leading-tight truncate">Không Gian Làm Việc & AI Agent</h1>
-          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold shrink-0">v13.0 Vercel</span>
+          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold shrink-0">v13.1 Gemini 3.8</span>
         </div>
         <p class="text-[11px] text-blue-200 hidden sm:block truncate">Tự động hóa BDTX • Skill Giáo án & Sổ điểm • Đồng bộ App Vercel</p>
       </div>
@@ -175,9 +175,9 @@
 
         <div id="chatBox" class="flex-1 p-3.5 overflow-y-auto custom-scrollbar space-y-3 bg-slate-50/40">
           <div class="bg-blue-50 border border-blue-100 text-slate-700 p-3 rounded-xl text-xs leading-relaxed">
-            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-sparkles text-amber-500 mr-1"></i> Chào Thầy Khái! Hệ thống v13.0 đã sẵn sàng.</p>
+            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-sparkles text-amber-500 mr-1"></i> Chào Thầy Khái! Hệ thống v13.1 (Gemini 3.8 Flash) đã sẵn sàng.</p>
             <ul class="list-disc pl-4 space-y-1">
-              <li><strong>Mở trang & Chạy Skill:</strong> Gõ <em>"Mở quản lý giáo án"</em> hoặc <em>"Mở quản lý trường học"</em> để AI mở trang và kích hoạt tự động điền/nộp hồ sơ.</li>
+              <li><strong>Mở trang & Chạy Skill:</strong> Gõ <em>"mở bdtx"</em>, <em>"mở quản lý giáo án"</em> hoặc <em>"mở quản lý trường học"</em> để AI mở trang ngay lập tức.</li>
               <li><strong>Đồng bộ App Vercel:</strong> Khi mở App Nhận xét học sinh hoặc Phân phối chương trình, bấm <strong>🔄 Đồng bộ App</strong> để AI đọc kết quả và hỗ trợ chuyển sang biểu mẫu khác.</li>
               <li><strong>Tổng kết cuối tuần:</strong> Bấm nút <strong>📊 Tổng kết tuần</strong> ở góc trên để AI xuất báo cáo công việc tự động.</li>
             </ul>
@@ -187,7 +187,7 @@
         <div class="p-2.5 border-t border-slate-200 bg-white shrink-0">
           <form onsubmit="handleCommand(event)" class="flex gap-2">
             <textarea id="agentInput" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); handleCommand(event);}" 
-                      placeholder="Ra lệnh (VD: Mở quản lý giáo án, Tổng kết công việc tuần này...)" 
+                      placeholder="Ra lệnh (VD: Mở bdtx, Mở quản lý giáo án, Tổng kết tuần...)" 
                       class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"></textarea>
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 rounded-lg text-sm font-medium transition flex items-center justify-center">
               <i class="fa-solid fa-paper-plane"></i>
@@ -246,8 +246,8 @@
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Chọn Model xử lý:</label>
           <select id="modelSelect" class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-blue-500">
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Tốc độ cực nhanh - Khuyên dùng)</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Tư duy sâu & Phân tích phức tạp)</option>
+            <option value="gemini-3.8-flash">Gemini 3.8 Flash (Tốc độ cực nhanh - Khuyên dùng)</option>
+            <option value="gemini-3.8-pro">Gemini 3.8 Pro (Tư duy sâu & Phân tích phức tạp)</option>
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-2">
@@ -312,6 +312,14 @@
   </div>
 
   <script>
+    // Tự động nâng cấp model cũ (2.5-flash) trong localStorage sang gemini-3.8-flash
+    (function migrateLegacyModel() {
+      const savedModel = localStorage.getItem('thaykhai_gemini_model');
+      if (!savedModel || savedModel.includes('2.5') || savedModel.includes('1.5')) {
+        localStorage.setItem('thaykhai_gemini_model', 'gemini-3.8-flash');
+      }
+    })();
+
     const initialLinks = [
       { id: "1", title: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG", url: "https://hsdttruong.qlgd.edu.vn/default.aspx", category: "school", pinned: true, note: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG, BIÊN BẢN SINH HOẠT CM", skill: "1. Mở mục Quản lý hồ sơ giáo án theo tuần. 2. Chọn khối lớp 4, bật khung tải tệp giáo án lên và nhấn Gửi duyệt." },
       { id: "2", title: "QUẢN LÝ HỌC SINH, ĐIỂM, SỔ CHỦ NHIỆM", url: "https://hcm.quanlytruonghoc.edu.vn/Default.aspx", category: "school", pinned: true, note: "QUẢN LÝ HỌC SINH, QUẢN LÝ ĐIỂM, SỔ CHỦ NHIỆM", skill: "1. Tự động điền Tài khoản/Mật khẩu mã hóa cục bộ. 2. Dừng tại ô Captcha để thầy xác nhận trong 3 giây." },
@@ -319,7 +327,7 @@
       { id: "4", title: "QUẢN LÝ LỚP HỌC, BÀI GIẢNG_ENETSTUDY", url: "https://giaovien.enetstudy.vn/", category: "teaching", pinned: true, note: "QUẢN LÝ LỚP HỌC, QUẢN LÝ BÀI GIẢNG_ENERSTUDY", skill: "Quản lý danh sách lớp học trực tuyến và giao bài tập cho học sinh." },
       { id: "5", title: "Napkin AI - Vẽ Sơ Đồ Tư Duy", url: "https://www.napkin.ai", category: "ai", pinned: true, note: "Tạo sơ đồ trực quan, minh họa bài giảng từ văn bản tự động", skill: "Dán nội dung bài học vào khung soạn thảo để AI tự động vẽ sơ đồ tư duy minh họa." },
       { id: "6", title: "GitHub Quản Lý Mã Nguồn", url: "https://github.com", category: "web", pinned: true, note: "Lưu trữ các Web App dạy học và xuất bản GitHub Pages", skill: "Quản lý mã nguồn các dự án Web App giáo dục." },
-      { id: "7", title: "BỒI DƯỠNG THƯỜNG XUYÊN", url: "https://taphuan.csdl.edu.vn/dashboard", category: "school", pinned: false, note: "Bồi dưỡng thường xuyên, TEMIS", skill: "Tự động bấm phát video bài giảng, chuyển bài học tiếp theo và giải đáp toàn bộ câu hỏi trắc nghiệm theo chương trình GDPT 2018." },
+      { id: "7", title: "BỒI DƯỠNG THƯỜNG XUYÊN (BDTX)", url: "https://taphuan.csdl.edu.vn/dashboard", category: "school", pinned: false, note: "Bồi dưỡng thường xuyên, BDTX, TEMIS", skill: "Tự động bấm phát video bài giảng, chuyển bài học tiếp theo và giải đáp toàn bộ câu hỏi trắc nghiệm theo chương trình GDPT 2018." },
       { id: "8", title: "EnetViet", url: "https://web.enetviet.com/", category: "school", pinned: false, note: "Điểm danh, báo bài", skill: "Điểm danh học sinh đầu giờ và gửi thông báo/báo bài cho phụ huynh." },
       { id: "9", title: "APP SINH HOẠT CHUYÊN MÔN", url: "https://sinh-hoat-chuyen-mon-khaicdv4-9703s-projects.vercel.app/?code=7869b355-9f21-4e0d-a44a-fee7ca9934d6", category: "teaching", pinned: false, note: "Web App sinh hoạt chuyên môn", skill: "Biên soạn và lưu trữ biên bản họp tổ chuyên môn." },
       { id: "10", title: "APP PHÂN PHỐI CHƯƠNG TRÌNH", url: "https://thaykhaiedu-ppct-hub.vercel.app", category: "school", pinned: false, note: "Quản lý phân phối chương trình", skill: "Tra cứu nhanh tiết học và tên bài dạy theo từng tuần học." },
@@ -359,7 +367,6 @@
       web: { text: 'Web & App', color: 'bg-amber-100 text-amber-700' }
     };
 
-    // Kích hoạt Skill Giáo án / Trường học trực tiếp qua Extension v13.0
     function runPageSkillFromApp() {
       const iframe = document.getElementById('webIframe');
       if (!iframe || !iframe.contentWindow) return;
@@ -379,7 +386,6 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Quét & đồng bộ dữ liệu từ các App Vercel tự tạo
     function syncDataFromVercelApp() {
       const iframe = document.getElementById('webIframe');
       if (!iframe || !iframe.contentWindow) return;
@@ -394,7 +400,6 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Lắng nghe dữ liệu phản hồi từ Extension v13.0
     window.addEventListener('message', (event) => {
       if (!event.data || event.data.source !== 'THAYKHAI_EXTENSION_RESPONSE') return;
       if (event.data.action === 'VERCEL_SYNC_SUCCESS') {
@@ -411,7 +416,6 @@
       }
     });
 
-    // Nút Báo cáo & Tổng kết tuần tự động
     async function generateWeeklyReport() {
       const apiKey = localStorage.getItem('thaykhai_gemini_key');
       if (!apiKey) {
@@ -443,7 +447,7 @@ ${pendingTasks}
 
 Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn thành, 2. Công việc đang theo dõi & Kế hoạch tuần tới, 3. Đề xuất tối ưu thời gian.`;
 
-      const model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
+      const model = 'gemini-3.8-flash';
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: 'POST',
@@ -478,7 +482,6 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       }, "*");
     }
 
-    // WORKSPACE EMBED FUNCTIONS
     function openInWorkspace(id) {
       const item = links.find(l => l.id === id);
       if (!item) return;
@@ -531,7 +534,6 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       iframe.src = iframe.src;
     }
 
-    // TIMER FUNCTIONS
     function formatTime(sec) {
       const h = String(Math.floor(sec / 3600)).padStart(2, '0');
       const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
@@ -573,7 +575,6 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       document.getElementById('timerDot').className = "w-2 h-2 rounded-full bg-slate-400";
     }
 
-    // RIGHT PANEL TABS & TASK CONTROL
     function switchRightTab(tab) {
       const chatTab = document.getElementById('tabRightChat');
       const ctrlTab = document.getElementById('tabRightControl');
@@ -633,7 +634,6 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       renderTasks();
     }
 
-    // API KEY SETTINGS
     function checkApiStatus() {
       const apiKey = localStorage.getItem('thaykhai_gemini_key');
       const btn = document.getElementById('apiStatusBtn');
@@ -654,7 +654,8 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       document.getElementById('apiModal').classList.remove('hidden');
       document.getElementById('apiModal').classList.add('flex');
       document.getElementById('apiKeyInput').value = localStorage.getItem('thaykhai_gemini_key') || '';
-      document.getElementById('modelSelect').value = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
+      const curModel = localStorage.getItem('thaykhai_gemini_model') || 'gemini-3.8-flash';
+      document.getElementById('modelSelect').value = curModel.includes('3.8') ? curModel : 'gemini-3.8-flash';
     }
 
     function closeApiModal() {
@@ -671,7 +672,6 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       closeApiModal();
     }
 
-    // LINKS CRUD & JSON IMPORT/EXPORT
     function saveToStorage() {
       localStorage.setItem('thaykhai_links_v13', JSON.stringify(links));
     }
@@ -849,7 +849,7 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       `;
     }
 
-    // GEMINI AI AGENT HANDLER
+    // GEMINI AI AGENT HANDLER (Đã nâng cấp lên gemini-3.8-flash)
     async function handleCommand(e) {
       e.preventDefault();
       const input = document.getElementById('agentInput');
@@ -883,21 +883,22 @@ Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn th
       const linksContext = links.map(l => `- Tên: "${l.title}" | URL: ${l.url} | Ghi chú: "${l.note}" | Skill: "${l.skill || ''}"`).join('\n');
 
       const systemPrompt = `Bạn là Trợ lý AI Agent trong Không gian làm việc khép kín của Thầy Võ Việt Khái (giáo viên tiểu học).
-Danh sách 22 trang web & Skill:
+Danh sách 22 trang web & Skill (Lưu ý: "bdtx" hoặc "bồi dưỡng thường xuyên" là trang BỒI DƯỠNG THƯỜNG XUYÊN - https://taphuan.csdl.edu.vn/dashboard):
 ${linksContext}
 
 Trang hiện tại đang mở trong khung làm việc: ${activeWorkspaceItem ? activeWorkspaceItem.title + ' (' + activeWorkspaceItem.url + ')' : 'Chưa mở trang nào'}
 ${syncedAppData ? '\nDữ liệu vừa quét được từ App Vercel:\n' + syncedAppData.slice(0, 2500) : ''}
 
 Nhiệm vụ điều hướng của bạn:
-1. Nếu thầy yêu cầu mở một trang web trong danh sách: Chèn lệnh sau ở cuối câu trả lời để mở trong App:
+1. Nếu thầy yêu cầu mở một trang web trong danh sách (ví dụ "mở bdtx", "mở quản lý giáo án"): Chèn lệnh sau ở cuối câu trả lời để mở trong App:
 [OPEN_WORKSPACE:{"title":"Tên trang","url":"https://..."}]
 2. Nếu thầy yêu cầu "mở thẻ mới", "mở tab ngoài" cho một trang web: Chèn lệnh sau ở cuối câu trả lời:
 [OPEN_NEW_TAB:{"title":"Tên trang","url":"https://..."}]
 3. Nếu thầy yêu cầu bấm vào một THẺ (Tab), nút bấm, menu hoặc mục bài học cụ thể BÊN TRONG trang web đang mở: Chèn lệnh:
 [CLICK_ELEMENT:"Tên thẻ hoặc nút cần bấm"]`;
 
-      const model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
+      let model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-3.8-flash';
+      if (!model.includes('3.8')) model = 'gemini-3.8-flash';
 
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
