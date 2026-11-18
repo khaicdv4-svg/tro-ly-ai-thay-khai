@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Không Gian Làm Việc & Trợ Lý AI Hybrid - Thầy Khái (v10.4)</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <title>Không Gian Làm Việc Khép Kín & AI Agent - Thầy Khái (v13.0)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #f1f5f9; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
     .prose p { margin-bottom: 0.45rem; }
@@ -19,100 +18,74 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800">
 
-  <!-- Toast Notification -->
-  <div id="toastBox" class="fixed bottom-4 right-4 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-emerald-500 text-xs flex items-center gap-2.5 transition-all">
-    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
-    <span id="toastText">Thông báo hệ thống</span>
-  </div>
-
   <!-- Top Navigation Bar -->
-  <header class="bg-blue-800 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md z-20 shrink-0">
-    <div class="flex items-center gap-2.5">
-      <div class="bg-white text-blue-800 p-1.5 rounded-lg font-bold shadow-sm">
+  <header class="bg-blue-800 text-white px-4 py-2.5 flex items-center justify-between shadow-md z-20 shrink-0 gap-2">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="bg-white text-blue-800 p-1.5 rounded-lg font-bold shadow-sm shrink-0">
         <i class="fa-solid fa-robot text-lg"></i>
       </div>
-      <div>
+      <div class="truncate">
         <div class="flex items-center gap-2">
-          <h1 class="text-sm sm:text-base font-bold leading-tight">Không Gian Làm Việc & Trợ Lý AI Hybrid</h1>
-          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold">v10.4 Chuẩn</span>
+          <h1 class="text-sm sm:text-base font-bold leading-tight truncate">Không Gian Làm Việc & AI Agent</h1>
+          <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold shrink-0">v13.0 Vercel</span>
         </div>
-        <p class="text-[11px] text-blue-200 hidden sm:block">Quản lý 22 liên kết • Tự động phát bài học & Chuyển mục 5 → 6 • Gemini 3.8 Flash</p>
+        <p class="text-[11px] text-blue-200 hidden sm:block truncate">Tự động hóa BDTX • Skill Giáo án & Sổ điểm • Đồng bộ App Vercel</p>
       </div>
     </div>
 
     <!-- Study / Work Session Timer -->
-    <div class="hidden xl:flex items-center gap-3 bg-blue-900/80 border border-blue-700 px-3 py-1.5 rounded-lg">
+    <div class="hidden xl:flex items-center gap-3 bg-blue-900/80 border border-blue-700 px-3 py-1.5 rounded-lg shrink-0">
       <div class="flex items-center gap-2">
         <span id="timerDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
-        <span class="text-xs text-blue-200">Giờ học:</span>
+        <span class="text-xs text-blue-200">Phiên:</span>
         <span id="sessionTimer" class="font-mono font-bold text-sm text-amber-300">00:00:00</span>
       </div>
-      <button id="timerToggleBtn" type="button" class="text-[11px] bg-blue-700 hover:bg-blue-600 px-2.5 py-1 rounded text-white transition">
+      <button onclick="toggleTimer()" id="timerToggleBtn" class="text-[11px] bg-blue-700 hover:bg-blue-600 px-2 py-0.5 rounded text-white transition">
         <i class="fa-solid fa-play"></i> Bắt đầu
       </button>
     </div>
 
     <!-- Action Controls -->
-    <div class="flex items-center gap-2">
-      <button id="apiStatusBtn" type="button" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
-        <i class="fa-solid fa-key"></i> <span id="apiStatusText">Điền API Key</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button onclick="generateWeeklyReport()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-indigo-400 shadow transition flex items-center gap-1.5" title="Tạo báo cáo tổng kết công việc tuần">
+        <i class="fa-solid fa-chart-column"></i> <span class="hidden md:inline">Tổng kết tuần</span>
       </button>
-      <label class="bg-blue-700 hover:bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded-lg border border-blue-500 transition flex items-center gap-1.5 cursor-pointer" title="Nạp danh sách từ file JSON">
-        <i class="fa-solid fa-file-import"></i> <span class="hidden sm:inline">Nhập JSON</span>
-        <input id="importJsonInput" type="file" accept=".json" class="hidden" />
+      <button onclick="openApiModal()" id="apiStatusBtn" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
+        <i class="fa-solid fa-key"></i> <span id="apiStatusText" class="hidden sm:inline">API Key</span>
+      </button>
+      <label class="bg-blue-700 hover:bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded-lg border border-blue-500 transition flex items-center gap-1 cursor-pointer" title="Nhập danh sách từ file JSON">
+        <i class="fa-solid fa-file-import"></i>
+        <input type="file" accept=".json" onchange="importJSON(event)" class="hidden" />
       </label>
-      <button id="downloadHtmlBtn" type="button" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5" title="Tải ngay tệp index.html chuẩn để đưa lên GitHub">
-        <i class="fa-solid fa-file-code"></i> <span>Tải index.html</span>
+      <button onclick="exportJSON()" class="bg-blue-700 hover:bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded-lg border border-blue-500 transition flex items-center gap-1" title="Xuất file JSON sao lưu">
+        <i class="fa-solid fa-download"></i>
       </button>
-      <button id="exportJsonBtn" type="button" class="bg-blue-700 hover:bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded-lg border border-blue-500 transition flex items-center gap-1.5" title="Tải về file JSON sao lưu">
-        <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Xuất JSON</span>
-      </button>
-      <button id="addLinkBtn" type="button" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
+      <button onclick="openModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
         <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm trang</span>
       </button>
     </div>
   </header>
 
   <!-- Main Workspace Area -->
-  <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+  <div class="flex-1 flex overflow-hidden">
     
     <!-- LEFT PANEL (65%): Dashboard OR Embedded Web Workspace -->
-    <main class="w-full lg:w-[65%] flex-1 flex flex-col overflow-hidden bg-slate-100 relative">
+    <main class="w-full lg:w-[65%] flex flex-col overflow-hidden bg-slate-100 relative">
       
-      <!-- Quick Control Banner for Tap Huan Lesson Navigation -->
-      <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 shrink-0">
-        <div class="flex flex-wrap items-center gap-2">
-          <span id="extBridgeDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-          <span class="text-xs font-bold text-emerald-300">Điều khiển Bài học (Mục 5 → 6):</span>
-          <span id="extBridgeBadge" class="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded-md">Đang chờ nạp Extension v10.4...</span>
-        </div>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button id="btnAutoPlayLesson" type="button" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-play"></i> <span id="txtAutoPlayLesson">Bật Tự Học & Tự Chuyển Mục</span>
-          </button>
-          <button id="btnForceNextSection" type="button" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-            <i class="fa-solid fa-forward-step"></i> Chuyển Mục Tiếp Ngay (5 → 6)
-          </button>
-          <button id="btnCopyConsoleScript" type="button" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5" title="Sao chép mã chạy trực tiếp 100% trên tab Tập huấn nếu không cài Python">
-            <i class="fa-solid fa-copy"></i> Chép Mã Chạy Trực Tiếp
-          </button>
-        </div>
-      </div>
-
       <!-- MODE 1: Dashboard Grid View -->
       <div id="dashboardView" class="flex-1 flex flex-col p-4 overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-2.5 mb-3.5 shrink-0">
           <div class="flex flex-wrap gap-1.5" id="category-tabs">
-            <button type="button" data-cat="all" class="tab-btn active px-3 py-1.5 rounded-full text-xs font-medium bg-blue-600 text-white shadow-sm">Tất cả (<span id="count-all">0</span>)</button>
-            <button type="button" data-cat="school" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border">Trường học & QL</button>
-            <button type="button" data-cat="teaching" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border">Giảng dạy</button>
-            <button type="button" data-cat="ai" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border">Công cụ AI</button>
-            <button type="button" data-cat="web" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border">Web & App</button>
+            <button onclick="filterCategory('all')" class="tab-btn active px-3 py-1.5 rounded-full text-xs font-medium bg-blue-600 text-white shadow-sm" data-cat="all">Tất cả (<span id="count-all">0</span>)</button>
+            <button onclick="filterCategory('school')" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border" data-cat="school">Trường học & QL</button>
+            <button onclick="filterCategory('teaching')" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border" data-cat="teaching">Giảng dạy</button>
+            <button onclick="filterCategory('ai')" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border" data-cat="ai">Công cụ AI</button>
+            <button onclick="filterCategory('web')" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 hover:bg-slate-50 border" data-cat="web">Web & App</button>
           </div>
 
-          <div class="relative w-full sm:w-56">
+          <div class="relative w-full sm:w-52">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-            <input type="text" id="searchInput" placeholder="Tìm trang web, ghi chú, skill..." 
+            <input type="text" id="searchInput" onkeyup="renderLinks()" placeholder="Tìm trang web, skill..." 
                    class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500" />
           </div>
         </div>
@@ -122,98 +95,99 @@
 
       <!-- MODE 2: Embedded Web Browser View -->
       <div id="workspaceView" class="hidden flex-1 flex flex-col overflow-hidden bg-white">
+        <!-- Workspace Toolbar -->
         <div class="bg-slate-800 text-white px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
           <div class="flex items-center gap-2 min-w-0">
-            <button id="backToDashboardBtn" type="button" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition shrink-0">
+            <button onclick="closeWorkspace()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition shrink-0">
               <i class="fa-solid fa-arrow-left"></i> Danh sách
             </button>
-            <div class="truncate max-w-[200px] sm:max-w-[300px]">
+            <div class="truncate max-w-[160px] sm:max-w-[230px]">
               <h2 id="wsTitle" class="text-xs font-bold text-emerald-400 truncate">Tên trang web</h2>
               <p id="wsUrl" class="text-[10px] text-slate-400 truncate">https://...</p>
             </div>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 shrink-0">
-            <button id="solveQuizOnPageBtn" type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> AI Giải Bài Tập
+            <button onclick="runPageSkillFromApp()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow flex items-center gap-1.5 transition" title="Chạy Skill tự động cho trang Giáo án / Trường học">
+              <i class="fa-solid fa-rocket"></i> Chạy Skill
             </button>
-            <button id="reloadWorkspaceBtn" type="button" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg" title="Tải lại khung trang">
+            <button onclick="syncDataFromVercelApp()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow flex items-center gap-1.5 transition" title="Quét & đồng bộ dữ liệu từ App Vercel đang mở">
+              <i class="fa-solid fa-rotate"></i> Đồng bộ App
+            </button>
+            <button onclick="reloadWorkspace()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg" title="Tải lại khung trang">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
-            <a id="wsExternalLink" href="https://taphuan.csdl.edu.vn/dashboard" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
-              <i class="fa-solid fa-up-right-from-square text-[10px]"></i> Mở thẻ ngoài
+            <a id="wsExternalLink" href="#" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition" title="Mở ra thẻ mới ngoài trình duyệt">
+              <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
             </a>
           </div>
         </div>
 
+        <!-- Skill Banner -->
         <div id="wsSkillBanner" class="bg-indigo-50 border-b border-indigo-200 px-4 py-1.5 text-xs text-indigo-900 flex items-start justify-between gap-3 shrink-0">
           <div class="flex items-start gap-2">
             <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 mt-0.5"></i>
             <div>
-              <span class="font-bold">Skill quy trình:</span> <span id="wsSkillText">Hướng dẫn thao tác trang</span>
+              <span class="font-bold">Skill quy trình:</span> <span id="wsSkillText">Sử dụng thanh điều khiển 🤖 AI v13.0 ở mép trên khung trang hoặc bấm nút Chạy Skill.</span>
             </div>
           </div>
-          <button id="closeSkillBannerBtn" type="button" class="text-indigo-400 hover:text-indigo-700"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="document.getElementById('wsSkillBanner').classList.add('hidden')" class="text-indigo-400 hover:text-indigo-700"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
+        <!-- Embedded Iframe -->
         <div class="flex-1 relative bg-slate-50">
-          <iframe id="webIframe" src="about:blank" allow="autoplay; fullscreen" class="w-full h-full border-0"></iframe>
+          <iframe id="webIframe" src="" allow="autoplay; fullscreen" class="w-full h-full border-0"></iframe>
         </div>
       </div>
 
     </main>
 
     <!-- RIGHT PANEL (35%): AI Agent & Work/Study Control Center -->
-    <aside class="w-full lg:w-[35%] bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col h-[45vh] lg:h-auto">
+    <aside class="w-full lg:w-[35%] bg-white border-l border-slate-200 flex flex-col">
       <div class="flex border-b border-slate-200 bg-slate-50 shrink-0">
-        <button id="tabRightChat" type="button" class="flex-1 py-2.5 text-xs font-bold text-blue-700 border-b-2 border-blue-600 bg-white flex items-center justify-center gap-1.5">
-          <span id="agentDot" class="w-2 h-2 rounded-full bg-amber-500"></span> Trợ lý AI (Gemini 3.8 Flash)
+        <button onclick="switchRightTab('chat')" id="tabRightChat" class="flex-1 py-2.5 text-xs font-bold text-blue-700 border-b-2 border-blue-600 bg-white flex items-center justify-center gap-1.5">
+          <span id="agentDot" class="w-2 h-2 rounded-full bg-amber-500"></span> Trợ lý AI Agent
         </button>
-        <button id="tabRightControl" type="button" class="flex-1 py-2.5 text-xs font-semibold text-slate-500 hover:text-slate-700 flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-list-check"></i> Tiến độ & Nhiệm vụ (<span id="taskCounter">0</span>)
+        <button onclick="switchRightTab('control')" id="tabRightControl" class="flex-1 py-2.5 text-xs font-semibold text-slate-500 hover:text-slate-700 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-list-check"></i> Tiến độ & Công việc (<span id="taskCounter">0</span>)
         </button>
       </div>
 
       <!-- TAB 1: AI AGENT CHAT -->
       <div id="rightPanelChat" class="flex-1 flex flex-col overflow-hidden">
         <div class="px-3 py-2 bg-blue-50/70 border-b border-blue-100 flex flex-wrap gap-1.5 items-center shrink-0">
-          <button type="button" data-prompt="Giải nhanh câu hỏi trắc nghiệm bồi dưỡng thường xuyên sau và chỉ rõ đáp án đúng:\n" 
-                  class="quick-prompt-btn text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
-            <i class="fa-solid fa-check-double mr-1"></i>Giải Trắc Nghiệm
+          <button onclick="useQuickPrompt('Giải nhanh câu hỏi trắc nghiệm bồi dưỡng thường xuyên sau và giải thích ngắn gọn lý do chọn đáp án:\n')" 
+                  class="text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
+            <i class="fa-solid fa-check-double mr-1"></i>Giải BDTX
           </button>
-          <button type="button" data-prompt="Tóm tắt các ý chính quan trọng nhất của tài liệu bài học sau thành gạch đầu dòng ngắn gọn:\n" 
-                  class="quick-prompt-btn text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
-            <i class="fa-solid fa-file-lines mr-1"></i>Tóm tắt bài học
+          <button onclick="useQuickPrompt('Dựa trên dữ liệu vừa đồng bộ từ App, hãy biên tập thành nhận xét/báo cáo chuẩn để điền vào sổ:\n')" 
+                  class="text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
+            <i class="fa-solid fa-file-pen mr-1"></i>Biên tập Sổ sách
           </button>
-          <button type="button" data-prompt="Viết 5 câu nhận xét học sinh lớp 4 theo Thông tư 27 về nội dung:\n" 
-                  class="quick-prompt-btn text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
-            <i class="fa-solid fa-pen-nib mr-1"></i>Nhận xét HS
+          <button onclick="generateWeeklyReport()" 
+                  class="text-[11px] bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 px-2 py-1 rounded transition font-medium">
+            <i class="fa-solid fa-chart-pie mr-1"></i>Báo cáo tuần
           </button>
-          <button id="voiceReplyToggleBtn" type="button" class="text-[11px] bg-emerald-600 text-white border border-emerald-600 px-2 py-1 rounded transition font-medium" title="Bật/tắt AI đọc to câu trả lời bằng tiếng Việt">
-            <i class="fa-solid fa-volume-high mr-1"></i>Đọc thoại: Bật
-          </button>
-          <button id="clearChatBtn" type="button" class="ml-auto text-[11px] text-slate-400 hover:text-slate-600 px-1.5" title="Làm mới chat">
+          <button onclick="clearChat()" class="ml-auto text-[11px] text-slate-400 hover:text-slate-600 px-1.5" title="Làm mới chat">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
         </div>
 
         <div id="chatBox" class="flex-1 p-3.5 overflow-y-auto custom-scrollbar space-y-3 bg-slate-50/40">
           <div class="bg-blue-50 border border-blue-100 text-slate-700 p-3 rounded-xl text-xs leading-relaxed">
-            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Bản v10.4 đã sửa lỗi Model API & Kết nối điều khiển!</p>
+            <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-sparkles text-amber-500 mr-1"></i> Chào Thầy Khái! Hệ thống v13.0 đã sẵn sàng.</p>
             <ul class="list-disc pl-4 space-y-1">
-              <li><strong>Điền API Key ngay trên giao diện:</strong> Bấm nút màu cam <strong>"Điền API Key"</strong> ở góc trên bên phải để nhập khóa Gemini của thầy.</li>
-              <li><strong>Tự động phát bài học & chuyển mục 5 → 6:</strong> Dùng thanh điều khiển màu đen ở trên cùng bên trái (tự đồng bộ với cả Chrome Extension v10.4 và Python Playwright).</li>
+              <li><strong>Mở trang & Chạy Skill:</strong> Gõ <em>"Mở quản lý giáo án"</em> hoặc <em>"Mở quản lý trường học"</em> để AI mở trang và kích hoạt tự động điền/nộp hồ sơ.</li>
+              <li><strong>Đồng bộ App Vercel:</strong> Khi mở App Nhận xét học sinh hoặc Phân phối chương trình, bấm <strong>🔄 Đồng bộ App</strong> để AI đọc kết quả và hỗ trợ chuyển sang biểu mẫu khác.</li>
+              <li><strong>Tổng kết cuối tuần:</strong> Bấm nút <strong>📊 Tổng kết tuần</strong> ở góc trên để AI xuất báo cáo công việc tự động.</li>
             </ul>
           </div>
         </div>
 
         <div class="p-2.5 border-t border-slate-200 bg-white shrink-0">
-          <form id="chatForm" class="flex gap-1.5 items-stretch">
-            <button id="voiceMicBtn" type="button" class="bg-slate-100 hover:bg-rose-100 text-slate-700 border border-slate-300 px-3 rounded-lg text-sm transition flex items-center justify-center" title="Nói lệnh bằng giọng nói tiếng Việt">
-              <i class="fa-solid fa-microphone"></i>
-            </button>
-            <textarea id="agentInput" rows="2" 
-                      placeholder="Nói hoặc gõ lệnh (mở trang, mở clip, qua bài, giải bài tập...) - Enter để gửi" 
+          <form onsubmit="handleCommand(event)" class="flex gap-2">
+            <textarea id="agentInput" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); handleCommand(event);}" 
+                      placeholder="Ra lệnh (VD: Mở quản lý giáo án, Tổng kết công việc tuần này...)" 
                       class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"></textarea>
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 rounded-lg text-sm font-medium transition flex items-center justify-center">
               <i class="fa-solid fa-paper-plane"></i>
@@ -226,22 +200,22 @@
       <div id="rightPanelControl" class="hidden flex-1 flex flex-col overflow-hidden p-3.5 bg-slate-50/50">
         <div class="bg-white border border-slate-200 rounded-xl p-3 mb-3 shadow-sm shrink-0">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-stopwatch text-blue-600 mr-1"></i> Kiểm soát thời gian học tập</span>
-            <button id="resetTimerBtn" type="button" class="text-[11px] text-slate-400 hover:text-red-500">Đặt lại</button>
+            <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-stopwatch text-blue-600 mr-1"></i> Thời gian làm việc & học tập</span>
+            <button onclick="resetTimer()" class="text-[11px] text-slate-400 hover:text-red-500">Đặt lại</button>
           </div>
           <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-100">
             <div>
-              <p class="text-[11px] text-slate-500">Tổng thời gian phiên hiện tại:</p>
+              <p class="text-[11px] text-slate-500">Phiên hiện tại:</p>
               <p id="panelTimerDisplay" class="font-mono font-bold text-base text-blue-700">00:00:00</p>
             </div>
-            <button id="panelTimerBtn" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-              <i class="fa-solid fa-play mr-1"></i> Bắt đầu tính giờ
+            <button onclick="toggleTimer()" id="panelTimerBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+              <i class="fa-solid fa-play mr-1"></i> Tính giờ
             </button>
           </div>
         </div>
 
-        <form id="addTaskForm" class="flex gap-1.5 mb-3 shrink-0">
-          <input type="text" id="newTaskInput" required placeholder="Thêm đầu việc / Module học tập..." 
+        <form onsubmit="addTask(event)" class="flex gap-1.5 mb-3 shrink-0">
+          <input type="text" id="newTaskInput" required placeholder="Thêm đầu việc tuần này..." 
                  class="flex-1 text-xs bg-white border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" />
           <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg">
             <i class="fa-solid fa-plus"></i>
@@ -258,28 +232,27 @@
   <div id="apiModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 border-b flex justify-between items-center">
-        <h3 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i> Điền Google Gemini API Key</h3>
-        <button id="closeApiModalBtn" type="button" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 class="font-bold text-slate-800"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i> Cấu hình Gemini API Key</h3>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-5 space-y-4">
         <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-xs text-emerald-800 leading-relaxed">
-          <i class="fa-solid fa-lock mr-1"></i> <strong>Lưu tự động 2 nơi:</strong> Khóa API thầy nhập tại đây sẽ được lưu trên trình duyệt và tự động đồng bộ xuống trình điều khiển Python (nếu đang bật).
+          <i class="fa-solid fa-lock mr-1"></i> <strong>Cam kết bảo mật cục bộ:</strong> Khóa API chỉ lưu trực tiếp trên trình duyệt của thầy (Local Storage).
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Dán Google Gemini API Key của thầy:</label>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Dán Google Gemini API Key:</label>
           <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
-          <p class="text-[11px] text-slate-500 mt-1">Lấy khóa tại <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline font-medium">Google AI Studio</a>.</p>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Chọn Model Gemini chuẩn (Chính thức):</label>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Chọn Model xử lý:</label>
           <select id="modelSelect" class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-blue-500">
-            <option value="gemini-3.8-flash">Gemini 3.8 Flash (Mới nhất - Khuyên dùng)</option>
-            <option value="gemini-3.8-pro">Gemini 3.8 Pro (Phân tích chuyên sâu)</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Tốc độ cực nhanh - Khuyên dùng)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Tư duy sâu & Phân tích phức tạp)</option>
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button id="cancelApiModalBtn" type="button" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Đóng</button>
-          <button id="saveApiKeyBtn" type="button" class="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Lưu cấu hình</button>
+          <button type="button" onclick="closeApiModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Đóng</button>
+          <button type="button" onclick="saveApiKey()" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">Lưu cấu hình</button>
         </div>
       </div>
     </div>
@@ -289,10 +262,10 @@
   <div id="linkModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 border-b flex justify-between items-center">
-        <h3 id="modalTitle" class="font-bold text-slate-800 text-sm">Thêm trang web & Cấu hình Skill</h3>
-        <button id="closeLinkModalBtn" type="button" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 id="modalTitle" class="font-bold text-slate-800">Thêm trang web & Cấu hình Skill</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-      <form id="linkForm" class="p-5 space-y-3.5">
+      <form onsubmit="saveLink(event)" class="p-5 space-y-3.5">
         <input type="hidden" id="editId" />
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tên trang web *</label>
@@ -331,8 +304,8 @@
                     class="w-full border border-indigo-200 bg-indigo-50/30 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"></textarea>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button id="cancelLinkModalBtn" type="button" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Hủy</button>
-          <button type="submit" class="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Lưu thông tin</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Hủy</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">Lưu thông tin</button>
         </div>
       </form>
     </div>
@@ -340,13 +313,13 @@
 
   <script>
     const initialLinks = [
-      { id: "1", title: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG", url: "https://hsdttruong.qlgd.edu.vn/default.aspx", category: "school", pinned: true, note: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG, BIÊN BẢN SINH HOẠT CM", skill: "1. Đăng nhập tài khoản giáo viên. 2. Vào mục Quản lý hồ sơ giáo án theo tuần. 3. Chọn khối lớp 4, tải tệp giáo án lên và nhấn Gửi duyệt." },
-      { id: "2", title: "QUẢN LÝ HỌC SINH, ĐIỂM, SỔ CHỦ NHIỆM", url: "https://hcm.quanlytruonghoc.edu.vn/Default.aspx", category: "school", pinned: true, note: "QUẢN LÝ HỌC SINH, QUẢN LÝ ĐIỂM, SỔ CHỦ NHIỆM", skill: "1. Đăng nhập hệ thống. 2. Chọn lớp chủ nhiệm. 3. Nhập điểm đánh giá định kỳ hoặc cập nhật nhận xét sổ chủ nhiệm." },
+      { id: "1", title: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG", url: "https://hsdttruong.qlgd.edu.vn/default.aspx", category: "school", pinned: true, note: "QUẢN LÝ GIÁO ÁN, BÁO GIẢNG, BIÊN BẢN SINH HOẠT CM", skill: "1. Mở mục Quản lý hồ sơ giáo án theo tuần. 2. Chọn khối lớp 4, bật khung tải tệp giáo án lên và nhấn Gửi duyệt." },
+      { id: "2", title: "QUẢN LÝ HỌC SINH, ĐIỂM, SỔ CHỦ NHIỆM", url: "https://hcm.quanlytruonghoc.edu.vn/Default.aspx", category: "school", pinned: true, note: "QUẢN LÝ HỌC SINH, QUẢN LÝ ĐIỂM, SỔ CHỦ NHIỆM", skill: "1. Tự động điền Tài khoản/Mật khẩu mã hóa cục bộ. 2. Dừng tại ô Captcha để thầy xác nhận trong 3 giây." },
       { id: "3", title: "QUẢN LÝ TIỂU HỌC_HỌC BẠ SỐ", url: "https://truong.hcm.edu.vn/Default.aspx", category: "school", pinned: true, note: "QUẢN LÝ TIỂU HỌC_HỌC BẠ SỐ", skill: "1. Đăng nhập cổng thông tin. 2. Kiểm tra dữ liệu học bạ số cuối kỳ và ký số xác nhận." },
       { id: "4", title: "QUẢN LÝ LỚP HỌC, BÀI GIẢNG_ENETSTUDY", url: "https://giaovien.enetstudy.vn/", category: "teaching", pinned: true, note: "QUẢN LÝ LỚP HỌC, QUẢN LÝ BÀI GIẢNG_ENERSTUDY", skill: "Quản lý danh sách lớp học trực tuyến và giao bài tập cho học sinh." },
       { id: "5", title: "Napkin AI - Vẽ Sơ Đồ Tư Duy", url: "https://www.napkin.ai", category: "ai", pinned: true, note: "Tạo sơ đồ trực quan, minh họa bài giảng từ văn bản tự động", skill: "Dán nội dung bài học vào khung soạn thảo để AI tự động vẽ sơ đồ tư duy minh họa." },
       { id: "6", title: "GitHub Quản Lý Mã Nguồn", url: "https://github.com", category: "web", pinned: true, note: "Lưu trữ các Web App dạy học và xuất bản GitHub Pages", skill: "Quản lý mã nguồn các dự án Web App giáo dục." },
-      { id: "7", title: "BỒI DƯỠNG THƯỜNG XUYÊN", url: "https://taphuan.csdl.edu.vn/dashboard", category: "school", pinned: true, note: "Bồi dưỡng thường xuyên, TEMIS", skill: "Tự động bấm phát video bài giảng, chuyển từ mục hiện tại sang mục tiếp theo (VD: mục 5 sang mục 6) và giải đáp câu hỏi trắc nghiệm." },
+      { id: "7", title: "BỒI DƯỠNG THƯỜNG XUYÊN", url: "https://taphuan.csdl.edu.vn/dashboard", category: "school", pinned: false, note: "Bồi dưỡng thường xuyên, TEMIS", skill: "Tự động bấm phát video bài giảng, chuyển bài học tiếp theo và giải đáp toàn bộ câu hỏi trắc nghiệm theo chương trình GDPT 2018." },
       { id: "8", title: "EnetViet", url: "https://web.enetviet.com/", category: "school", pinned: false, note: "Điểm danh, báo bài", skill: "Điểm danh học sinh đầu giờ và gửi thông báo/báo bài cho phụ huynh." },
       { id: "9", title: "APP SINH HOẠT CHUYÊN MÔN", url: "https://sinh-hoat-chuyen-mon-khaicdv4-9703s-projects.vercel.app/?code=7869b355-9f21-4e0d-a44a-fee7ca9934d6", category: "teaching", pinned: false, note: "Web App sinh hoạt chuyên môn", skill: "Biên soạn và lưu trữ biên bản họp tổ chuyên môn." },
       { id: "10", title: "APP PHÂN PHỐI CHƯƠNG TRÌNH", url: "https://thaykhaiedu-ppct-hub.vercel.app", category: "school", pinned: false, note: "Quản lý phân phối chương trình", skill: "Tra cứu nhanh tiết học và tên bài dạy theo từng tuần học." },
@@ -365,47 +338,19 @@
     ];
 
     const initialTasks = [
-      { id: "t1", text: "Hoàn thành chuyển tiếp Mục 5 sang Mục 6 trên Bồi dưỡng thường xuyên", done: false },
-      { id: "t2", text: "Kiểm tra & nộp giáo án tuần trên hệ thống QLGD", done: false },
-      { id: "t3", text: "Cập nhật nhận xét đánh giá học sinh lớp 4", done: false }
+      { id: "t1", text: "Kiểm tra & nộp giáo án tuần trên hệ thống QLGD", done: false },
+      { id: "t2", text: "Hoàn thành các bài học & trắc nghiệm Bồi dưỡng thường xuyên", done: false },
+      { id: "t3", text: "Cập nhật nhận xét đánh giá học sinh lớp 4", done: false },
+      { id: "t4", text: "Rà soát phân phối chương trình & báo giảng tuần tới", done: false }
     ];
 
-    function safeGetStorage(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-      } catch (e) {
-        return fallback;
-      }
-    }
-
-    function safeSetStorage(key, val) {
-      try {
-        localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
-      } catch (e) {}
-    }
-
-    function safeGetString(key, fallback = '') {
-      try {
-        return localStorage.getItem(key) || fallback;
-      } catch (e) {
-        return fallback;
-      }
-    }
-
-    let links = safeGetStorage('thaykhai_links_v3', initialLinks);
-    let tasks = safeGetStorage('thaykhai_tasks_v4', initialTasks);
+    let links = JSON.parse(localStorage.getItem('thaykhai_links_v13')) || initialLinks;
+    let tasks = JSON.parse(localStorage.getItem('thaykhai_tasks_v13')) || initialTasks;
     let currentCategory = 'all';
     let activeWorkspaceItem = null;
     let timerSeconds = 0;
     let timerInterval = null;
-    let isAutoPlayOn = false;
-
-    // Tự động nâng cấp tất cả model cũ (2.5 / 2.0) lên gemini-3.8-flash theo yêu cầu mới của Google API
-    const savedModel = safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash');
-    if (!savedModel.includes('3.8')) {
-      safeSetStorage('thaykhai_gemini_model', 'gemini-3.8-flash');
-    }
+    let syncedAppData = '';
 
     const categoryLabels = {
       school: { text: 'Trường học', color: 'bg-indigo-100 text-indigo-700' },
@@ -414,201 +359,126 @@
       web: { text: 'Web & App', color: 'bg-amber-100 text-amber-700' }
     };
 
-    function showToast(msg) {
-      const box = document.getElementById('toastBox');
-      const txt = document.getElementById('toastText');
-      txt.innerText = msg;
-      box.classList.remove('hidden');
-      setTimeout(() => {
-        box.classList.add('hidden');
-      }, 3800);
-    }
-
-    function sendToExtensionFrame(action, payload = null) {
+    // Kích hoạt Skill Giáo án / Trường học trực tiếp qua Extension v13.0
+    function runPageSkillFromApp() {
       const iframe = document.getElementById('webIframe');
-      if (iframe && iframe.contentWindow) {
-        try {
-          const rect = iframe.getBoundingClientRect();
-          iframe.contentWindow.postMessage({
-            source: "THAYKHAI_AI_AGENT",
-            action: action,
-            payload: payload,
-            offsetX: rect.left,
-            offsetY: rect.top
-          }, "*");
-        } catch (e) {}
+      if (!iframe || !iframe.contentWindow) return;
+      const url = activeWorkspaceItem?.url || '';
+      let action = 'EXEC_SKILL_QLGD';
+      if (url.includes('quanlytruonghoc.edu.vn') || url.includes('truong.hcm.edu.vn')) {
+        action = 'EXEC_SKILL_QLTH';
       }
+      iframe.contentWindow.postMessage({ source: 'THAYKHAI_AI_AGENT', action: action }, '*');
+      switchRightTab('chat');
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML += `
+        <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-xs text-amber-900">
+          <i class="fa-solid fa-rocket text-amber-600 mr-1"></i> Đã gửi tín hiệu kích hoạt <strong>Skill tự động</strong> sang Extension v13.0 trên khung làm việc bên trái!
+        </div>
+      `;
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    setInterval(() => {
-      const ws = document.getElementById('workspaceView');
-      if (ws && !ws.classList.contains('hidden')) {
-        sendToExtensionFrame('SYNC_IFRAME_OFFSET');
-      }
-    }, 1500);
-
-    // Gửi lệnh tới cả Chrome Extension v10.4 và Python Hybrid Server (nếu đang chạy cùng nguồn)
-    async function dispatchHybridAction(action, target = '', url = '') {
-      if (action === 'START_AUTO') sendToExtensionFrame('START_AUTO_VIDEO');
-      if (action === 'STOP_AUTO') sendToExtensionFrame('STOP_AUTO_VIDEO');
-      if (action === 'NEXT_SECTION') sendToExtensionFrame('CLICK_ELEMENT', 'Tiếp theo');
-      if (action === 'CLICK_TEXT') sendToExtensionFrame('CLICK_ELEMENT', target);
-
-      if (window.location.protocol.startsWith('http')) {
-        const apiBase = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
-          ? ''
-          : 'http://127.0.0.1:8765';
-        try {
-          const res = await fetch(apiBase + '/api/action', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: action,
-              target: target,
-              url: url,
-              api_key: safeGetString('thaykhai_gemini_key', ''),
-              model: safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash')
-            })
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.message) showToast(data.message);
-            return data;
-          }
-        } catch (e) {}
-      }
-      return null;
+    // Quét & đồng bộ dữ liệu từ các App Vercel tự tạo
+    function syncDataFromVercelApp() {
+      const iframe = document.getElementById('webIframe');
+      if (!iframe || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage({ source: 'THAYKHAI_AI_AGENT', action: 'SYNC_VERCEL_APP_DATA' }, '*');
+      switchRightTab('chat');
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML += `
+        <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl text-xs text-indigo-900">
+          <i class="fa-solid fa-rotate fa-spin text-indigo-600 mr-1"></i> Đang đồng bộ dữ liệu từ <strong>${activeWorkspaceItem?.title || 'App Vercel'}</strong> sang bộ nhớ AI Agent...
+        </div>
+      `;
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function toggleAutoPlayLesson() {
-      const btn = document.getElementById('btnAutoPlayLesson');
-      const txt = document.getElementById('txtAutoPlayLesson');
-      isAutoPlayOn = !isAutoPlayOn;
-
-      if (isAutoPlayOn) {
-        btn.className = "bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 animate-pulse";
-        txt.innerText = "Đang Tự Học (Bấm để dừng)";
-        dispatchHybridAction('START_AUTO');
-        showToast("Đã bật Tự động phát bài học & Tự chuyển sang mục kế tiếp!");
-      } else {
-        btn.className = "bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5";
-        txt.innerText = "Bật Tự Học & Tự Chuyển Mục";
-        dispatchHybridAction('STOP_AUTO');
-        showToast("Đã dừng chế độ Tự học.");
-      }
-    }
-
-    function forceNextSectionNow() {
-      dispatchHybridAction('NEXT_SECTION');
-      showToast("Đã gửi lệnh chuyển từ mục hiện tại sang mục tiếp theo (5 → 6)!");
-    }
-
-    function copyDirectConsoleScript() {
-      const snippet = `(function(){setInterval(()=>{document.querySelectorAll('video').forEach(v=>{v.muted=true;if(v.paused&&!v.ended)v.play().catch(()=>{});if(v.ended||(v.duration>5&&v.currentTime>=v.duration-1.5)){const btns=Array.from(document.querySelectorAll('button,a,span,div')).filter(e=>e.offsetParent!==null);const next=btns.find(e=>/^(tiếp theo|bài tiếp|mục tiếp|hoàn thành)$/i.test((e.innerText||'').trim()));if(next){next.click();return;}const act=document.querySelector('.active,.is-active,.current,.selected,[aria-current="page"]');if(act){const row=act.closest('li,.el-menu-item,.el-tree-node,.item')||act;if(row.nextElementSibling)row.nextElementSibling.click();}}});},2500);console.log('Đã bật tự phát & tự chuyển mục 5 -> 6!');})();`;
-      const ta = document.createElement('textarea');
-      ta.value = snippet;
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand('copy');
-        showToast("Đã chép mã! Thầy qua tab Tập huấn nhấn F12 -> Console -> Ctrl+V rồi Enter là tự chạy 100%.");
-      } catch (e) {}
-      ta.remove();
-    }
-
-    // Lắng nghe tín hiệu kết nối và dữ liệu câu hỏi từ Extension v10.4 gửi về
-    window.addEventListener("message", async (event) => {
-      if (!event.data || event.data.source !== "THAYKHAI_EXTENSION_RESPONSE") return;
-      if (event.data.action === "EXTENSION_HEARTBEAT") {
-        const dot = document.getElementById('extBridgeDot');
-        const badge = document.getElementById('extBridgeBadge');
-        if (dot && badge) {
-          dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-          badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded-md font-semibold";
-          badge.innerText = "Đã kết nối Extension v" + (event.data.version || "10.1");
-        }
-        return;
-      }
-      if (event.data.action === "PAGE_CONTENT_RESULT") {
-        await processPageWithGemini(event.data.data);
+    // Lắng nghe dữ liệu phản hồi từ Extension v13.0
+    window.addEventListener('message', (event) => {
+      if (!event.data || event.data.source !== 'THAYKHAI_EXTENSION_RESPONSE') return;
+      if (event.data.action === 'VERCEL_SYNC_SUCCESS') {
+        syncedAppData = event.data.data || '';
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `
+          <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900">
+            <p class="font-bold mb-1"><i class="fa-solid fa-check-circle text-emerald-600 mr-1"></i> Đồng bộ dữ liệu thành công!</p>
+            <p class="text-[11px] text-slate-600 line-clamp-3 bg-white p-2 rounded border border-emerald-100">${syncedAppData.slice(0, 300)}...</p>
+            <p class="mt-1.5 text-[11px]">Thầy có thể yêu cầu em biên tập, tóm tắt hoặc chuẩn hóa dữ liệu này để điền vào Sổ chủ nhiệm / Giáo án ngay bây giờ.</p>
+          </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     });
 
-    async function processPageWithGemini(pageData) {
-      const apiKey = safeGetString('thaykhai_gemini_key', '');
+    // Nút Báo cáo & Tổng kết tuần tự động
+    async function generateWeeklyReport() {
+      const apiKey = localStorage.getItem('thaykhai_gemini_key');
       if (!apiKey) {
-        showToast('Thầy hãy bấm nút "Điền API Key" ở góc trên bên phải trước nhé!');
+        alert('Thầy vui lòng cài đặt Gemini API Key trước để AI xuất báo cáo tổng kết tuần nhé!');
         openApiModal();
         return;
       }
-
       switchRightTab('chat');
       const chatBox = document.getElementById('chatBox');
-      const loadingId = 'ext-load-' + Date.now();
+      const loadId = 'rep-' + Date.now();
       chatBox.innerHTML += `
-        <div id="${loadingId}" class="bg-white border border-slate-200 p-2.5 rounded-xl text-xs text-slate-600 flex items-center gap-2">
-          <i class="fa-solid fa-circle-notch fa-spin text-emerald-600"></i> Đã nhận câu hỏi từ trang <strong>${pageData.title || 'bài học'}</strong>. AI đang giải...
+        <div id="${loadId}" class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl text-xs text-indigo-800 flex items-center gap-2">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Đang tổng hợp tiến độ công việc và xuất báo cáo tuần...
         </div>
       `;
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      const skillContext = activeWorkspaceItem?.skill || "Giải chính xác tất cả câu hỏi trắc nghiệm và tự luận theo Chương trình GDPT 2018.";
-      const prompt = `Trang web hiện tại: "${pageData.title}" (${pageData.url}).
-Skill quy trình: "${skillContext}".
+      const doneTasks = tasks.filter(t => t.done).map(t => `- [Đã hoàn thành] ${t.text}`).join('\n') || '- Chưa đánh dấu hoàn thành mục nào';
+      const pendingTasks = tasks.filter(t => !t.done).map(t => `- [Đang thực hiện] ${t.text}`).join('\n') || '- Không còn việc tồn đọng';
+      const sessionTime = formatTime(timerSeconds);
+      const today = new Date().toLocaleDateString('vi-VN');
 
-Nội dung câu hỏi và bài tập trên trang:
-"""
-${pageData.text}
-"""
+      const prompt = `Hãy lập một bản **Báo cáo & Tổng kết Công việc Tuần** (ngày ${today}) thật chuyên nghiệp, súc tích cho giáo viên tiểu học (Thầy Võ Việt Khái) dựa trên dữ liệu thực tế sau:
+- Thời gian làm việc/học tập ghi nhận trong phiên: ${sessionTime}
+- Các đầu việc đã hoàn thành:
+${doneTasks}
+- Các đầu việc đang triển khai / kế hoạch tuần tới:
+${pendingTasks}
 
-Danh sách các phần tử tương tác / đáp án có thể bấm chọn (inputs):
-${JSON.stringify(pageData.inputs)}
+Trình bày thành 3 phần rõ ràng: 1. Kết quả công việc đã hoàn thành, 2. Công việc đang theo dõi & Kế hoạch tuần tới, 3. Đề xuất tối ưu thời gian.`;
 
-Yêu cầu:
-1. Liệt kê ngắn gọn đáp án đúng cho tất cả các câu hỏi đang hiển thị trên trang.
-2. Xuất mảng JSON lệnh tự động tích chọn ở cuối câu trả lời theo định dạng:
-[AUTO_FILL:[{"index": số_thứ_tự_index, "value": "true"}]]`;
-
-      const model = safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash');
-
+      const model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: prompt }] }]
-          })
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] })
         });
-
-        const data = await response.json();
-        document.getElementById(loadingId)?.remove();
-
-        if (data.error) throw new Error(data.error.message || 'Lỗi gọi Gemini API');
-
-        let replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không phân tích được nội dung trang.';
-        const fillMatch = replyText.match(/\[AUTO_FILL:(\[.*?\])\]/s);
-
-        if (fillMatch) {
-          try {
-            const fillPayload = JSON.parse(fillMatch[1]);
-            replyText = replyText.replace(fillMatch[0], '').trim();
-            sendToExtensionFrame("AUTO_FILL_DATA", fillPayload);
-          } catch (e) {}
-        }
-
+        const data = await res.json();
+        document.getElementById(loadId)?.remove();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không thể tạo báo cáo.';
         chatBox.innerHTML += `
-          <div class="bg-white border border-emerald-200 p-3 rounded-xl text-xs text-slate-700 shadow-xs prose max-w-none leading-relaxed">
-            <div class="text-[11px] font-bold text-emerald-700 mb-1"><i class="fa-solid fa-check-circle"></i> Đã giải & tự động chọn đáp án:</div>
-            ${marked.parse(replyText)}
+          <div class="bg-white border border-indigo-200 p-3.5 rounded-xl text-xs text-slate-700 shadow-sm prose max-w-none leading-relaxed">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2">
+              <span class="font-bold text-indigo-800"><i class="fa-solid fa-file-contract mr-1"></i> BÁO CÁO TỔNG KẾT TUẦN (${today})</span>
+            </div>
+            ${marked.parse(reply)}
           </div>
         `;
       } catch (err) {
-        document.getElementById(loadingId)?.remove();
-        chatBox.innerHTML += `<div class="bg-red-50 text-red-700 p-2.5 rounded-xl text-xs">Lỗi xử lý: ${err.message}</div>`;
+        document.getElementById(loadId)?.remove();
+        chatBox.innerHTML += `<div class="bg-red-50 text-red-700 p-2.5 rounded-xl text-xs">Lỗi tạo báo cáo: ${err.message}</div>`;
       }
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    function clickElementInWorkspace(targetText) {
+      const iframe = document.getElementById('webIframe');
+      if (!iframe || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage({
+        source: "THAYKHAI_AI_AGENT",
+        action: "CLICK_ELEMENT",
+        payload: targetText
+      }, "*");
+    }
+
+    // WORKSPACE EMBED FUNCTIONS
     function openInWorkspace(id) {
       const item = links.find(l => l.id === id);
       if (!item) return;
@@ -617,13 +487,17 @@ Yêu cầu:
       document.getElementById('wsUrl').innerText = item.url;
       document.getElementById('wsExternalLink').href = item.url;
       document.getElementById('webIframe').src = item.url;
-      document.getElementById('wsSkillText').innerText = item.skill || item.note || 'Sử dụng thanh điều khiển phía trên để tự động phát và chuyển mục.';
-      document.getElementById('wsSkillBanner').classList.remove('hidden');
+
+      const skillBanner = document.getElementById('wsSkillBanner');
+      if (item.skill && item.skill.trim().length > 0) {
+        document.getElementById('wsSkillText').innerText = item.skill;
+      } else {
+        document.getElementById('wsSkillText').innerText = 'Sử dụng thanh điều khiển 🤖 AI v13.0 ở mép trên khung trang hoặc bấm nút Đồng bộ App.';
+      }
+      skillBanner.classList.remove('hidden');
 
       document.getElementById('dashboardView').classList.add('hidden');
       document.getElementById('workspaceView').classList.remove('hidden');
-
-      dispatchHybridAction('OPEN_URL', item.title, item.url);
 
       if (item.url.includes('taphuan.csdl.edu.vn') && !timerInterval) {
         toggleTimer();
@@ -642,7 +516,6 @@ Yêu cầu:
         document.getElementById('webIframe').src = url;
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('workspaceView').classList.remove('hidden');
-        dispatchHybridAction('OPEN_URL', title, url);
       }
     }
 
@@ -658,6 +531,7 @@ Yêu cầu:
       iframe.src = iframe.src;
     }
 
+    // TIMER FUNCTIONS
     function formatTime(sec) {
       const h = String(Math.floor(sec / 3600)).padStart(2, '0');
       const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
@@ -699,6 +573,7 @@ Yêu cầu:
       document.getElementById('timerDot').className = "w-2 h-2 rounded-full bg-slate-400";
     }
 
+    // RIGHT PANEL TABS & TASK CONTROL
     function switchRightTab(tab) {
       const chatTab = document.getElementById('tabRightChat');
       const ctrlTab = document.getElementById('tabRightControl');
@@ -726,26 +601,51 @@ Yêu cầu:
       list.innerHTML = tasks.map(t => `
         <div class="bg-white border ${t.done ? 'border-slate-100 bg-slate-50/70' : 'border-slate-200'} rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-xs">
           <label class="flex items-start gap-2.5 cursor-pointer flex-1">
-            <input type="checkbox" data-task-toggle="${t.id}" ${t.done ? 'checked' : ''} class="mt-0.5 rounded text-blue-600 w-4 h-4" />
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask('${t.id}')" class="mt-0.5 rounded text-blue-600 w-4 h-4" />
             <span class="text-xs leading-snug ${t.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">${t.text}</span>
           </label>
-          <button type="button" data-task-delete="${t.id}" class="text-slate-300 hover:text-red-500 p-1"><i class="fa-solid fa-trash text-[11px]"></i></button>
+          <button onclick="deleteTask('${t.id}')" class="text-slate-300 hover:text-red-500 p-1"><i class="fa-solid fa-trash text-[11px]"></i></button>
         </div>
       `).join('');
     }
 
+    function addTask(e) {
+      e.preventDefault();
+      const input = document.getElementById('newTaskInput');
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.unshift({ id: 't' + Date.now(), text, done: false });
+      localStorage.setItem('thaykhai_tasks_v13', JSON.stringify(tasks));
+      input.value = '';
+      renderTasks();
+    }
+
+    function toggleTask(id) {
+      const t = tasks.find(item => item.id === id);
+      if (t) t.done = !t.done;
+      localStorage.setItem('thaykhai_tasks_v13', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(item => item.id !== id);
+      localStorage.setItem('thaykhai_tasks_v13', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    // API KEY SETTINGS
     function checkApiStatus() {
-      const apiKey = safeGetString('thaykhai_gemini_key', '');
+      const apiKey = localStorage.getItem('thaykhai_gemini_key');
       const btn = document.getElementById('apiStatusBtn');
       const txt = document.getElementById('apiStatusText');
       const dot = document.getElementById('agentDot');
       if (apiKey && apiKey.trim().length > 10) {
-        btn.className = "bg-blue-900 hover:bg-blue-950 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-700 transition flex items-center gap-1.5";
+        btn.className = "bg-blue-900 hover:bg-blue-950 text-emerald-300 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-blue-700 transition flex items-center gap-1.5";
         txt.innerText = "API Sẵn Sàng";
         dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
       } else {
-        btn.className = "bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5";
-        txt.innerText = "Điền API Key";
+        btn.className = "bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1.5";
+        txt.innerText = "API Key";
         dot.className = "w-2 h-2 rounded-full bg-amber-500";
       }
     }
@@ -753,8 +653,8 @@ Yêu cầu:
     function openApiModal() {
       document.getElementById('apiModal').classList.remove('hidden');
       document.getElementById('apiModal').classList.add('flex');
-      document.getElementById('apiKeyInput').value = safeGetString('thaykhai_gemini_key', '');
-      document.getElementById('modelSelect').value = safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash');
+      document.getElementById('apiKeyInput').value = localStorage.getItem('thaykhai_gemini_key') || '';
+      document.getElementById('modelSelect').value = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
     }
 
     function closeApiModal() {
@@ -765,12 +665,15 @@ Yêu cầu:
     function saveApiKey() {
       const key = document.getElementById('apiKeyInput').value.trim();
       const model = document.getElementById('modelSelect').value;
-      safeSetStorage('thaykhai_gemini_key', key);
-      safeSetStorage('thaykhai_gemini_model', model);
+      localStorage.setItem('thaykhai_gemini_key', key);
+      localStorage.setItem('thaykhai_gemini_model', model);
       checkApiStatus();
       closeApiModal();
-      dispatchHybridAction('SAVE_KEY');
-      showToast('Đã lưu API Key thành công!');
+    }
+
+    // LINKS CRUD & JSON IMPORT/EXPORT
+    function saveToStorage() {
+      localStorage.setItem('thaykhai_links_v13', JSON.stringify(links));
     }
 
     function filterCategory(cat) {
@@ -808,18 +711,18 @@ Yêu cầu:
                 </div>
                 <div class="flex items-center gap-0.5 opacity-75 group-hover:opacity-100">
                   ${item.pinned ? '<i class="fa-solid fa-thumbtack text-blue-600 text-[10px] mr-1"></i>' : ''}
-                  <button type="button" data-link-edit="${item.id}" class="text-slate-400 hover:text-blue-600 p-1" title="Sửa"><i class="fa-solid fa-pen text-[11px]"></i></button>
-                  <button type="button" data-link-delete="${item.id}" class="text-slate-400 hover:text-red-600 p-1" title="Xóa"><i class="fa-solid fa-trash text-[11px]"></i></button>
+                  <button onclick="editLink('${item.id}')" class="text-slate-400 hover:text-blue-600 p-1" title="Sửa"><i class="fa-solid fa-pen text-[11px]"></i></button>
+                  <button onclick="deleteLink('${item.id}')" class="text-slate-400 hover:text-red-600 p-1" title="Xóa"><i class="fa-solid fa-trash text-[11px]"></i></button>
                 </div>
               </div>
               <h3 class="font-bold text-slate-800 text-xs mb-1 line-clamp-1" title="${item.title}">${item.title}</h3>
               <p class="text-[11px] text-slate-500 line-clamp-2 mb-2.5 min-h-[30px]">${item.note || 'Chưa có ghi chú'}</p>
             </div>
             <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
-              <button type="button" data-link-open="${item.id}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1">
-                <i class="fa-solid fa-desktop text-[10px]"></i> Mở & Điều khiển
+              <button onclick="openInWorkspace('${item.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1">
+                <i class="fa-solid fa-desktop text-[10px]"></i> Mở trong App
               </button>
-              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] py-1.5 px-2 rounded-lg transition" title="Mở tab ngoài">
+              <a href="${item.url}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] py-1.5 px-2 rounded-lg transition" title="Mở tab ngoài">
                 <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
               </a>
             </div>
@@ -880,31 +783,24 @@ Yêu cầu:
       } else {
         links.unshift(newItem);
       }
-      safeSetStorage('thaykhai_links_v3', links);
+      saveToStorage();
       renderLinks();
       closeModal();
-      showToast('Đã lưu thông tin trang web!');
     }
 
-    function downloadCleanIndexHtml() {
-      const cleanHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([cleanHtml], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "index.html";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
-      showToast("Đã tải tệp index.html! Thầy đưa tệp này lên GitHub nhé.");
+    function deleteLink(id) {
+      if (confirm('Thầy có chắc chắn muốn xóa trang web này không?')) {
+        links = links.filter(l => l.id !== id);
+        saveToStorage();
+        renderLinks();
+      }
     }
 
     function exportJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(links, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "so-tay-lien-ket-v10-thaykhai.json");
+      downloadAnchor.setAttribute("download", "so-tay-lien-ket-v13-thaykhai.json");
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -927,26 +823,42 @@ Yêu cầu:
               note: item.note || '',
               skill: item.skill || ''
             }));
-            safeSetStorage('thaykhai_links_v3', links);
+            saveToStorage();
             renderLinks();
-            showToast(`Đã nhập thành công ${links.length} liên kết!`);
+            alert(`Đã nhập thành công ${links.length} liên kết từ file JSON!`);
           }
         } catch (err) {
-          showToast('File JSON không đúng định dạng!');
+          alert('File JSON không đúng định dạng!');
         }
       };
       reader.readAsText(file);
     }
 
+    function useQuickPrompt(prefix) {
+      switchRightTab('chat');
+      const input = document.getElementById('agentInput');
+      input.value = prefix + (syncedAppData ? '\n\n[Dữ liệu đã đồng bộ từ App]:\n' + syncedAppData : '');
+      input.focus();
+    }
+
+    function clearChat() {
+      document.getElementById('chatBox').innerHTML = `
+        <div class="bg-blue-50 border border-blue-100 text-slate-700 p-2.5 rounded-xl text-xs">
+          Đã làm mới khung trò chuyện. Sẵn sàng nhận lệnh!
+        </div>
+      `;
+    }
+
+    // GEMINI AI AGENT HANDLER
     async function handleCommand(e) {
       e.preventDefault();
       const input = document.getElementById('agentInput');
       const text = input.value.trim();
       if (!text) return;
 
-      const apiKey = safeGetString('thaykhai_gemini_key', '');
+      const apiKey = localStorage.getItem('thaykhai_gemini_key');
       if (!apiKey) {
-        showToast('Thầy vui lòng bấm "Điền API Key" ở góc trên bên phải trước nhé!');
+        alert('Thầy vui lòng bấm "API Key" ở góc trên bên phải để nhập khóa API trước nhé!');
         openApiModal();
         return;
       }
@@ -960,45 +872,32 @@ Yêu cầu:
       input.value = '';
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Xử lý nhanh lệnh bằng lời thoại hoặc chữ
-      if (/mở clip|phát video|bật video|tự học|chạy video/i.test(text)) {
-        if (!isAutoPlayOn) toggleAutoPlayLesson();
-        else dispatchHybridAction('START_AUTO');
-      }
-      if (/mục\s*6|tiếp theo|qua bài|chuyển mục|chuyển clip/i.test(text)) {
-        dispatchHybridAction('NEXT_SECTION');
-      }
-      if (/giải bài|làm bài|trả lời câu hỏi|trắc nghiệm/i.test(text) && text.length < 80) {
-        dispatchHybridAction('SOLVE_QUIZ', text);
-      }
-
       const loadingId = 'loading-' + Date.now();
       chatBox.innerHTML += `
         <div id="${loadingId}" class="bg-white border border-slate-200 p-2.5 rounded-xl text-xs text-slate-500 flex items-center gap-2 w-fit">
-          <i class="fa-solid fa-circle-notch fa-spin text-blue-600"></i> Gemini 3.8 Flash đang xử lý...
+          <i class="fa-solid fa-circle-notch fa-spin text-blue-600"></i> Đang phân tích & điều phối...
         </div>
       `;
       chatBox.scrollTop = chatBox.scrollHeight;
 
       const linksContext = links.map(l => `- Tên: "${l.title}" | URL: ${l.url} | Ghi chú: "${l.note}" | Skill: "${l.skill || ''}"`).join('\n');
 
-      const systemPrompt = `Bạn là Trợ lý AI Agent trong Không gian làm việc của thầy Võ Việt Khái (giáo viên tiểu học).
+      const systemPrompt = `Bạn là Trợ lý AI Agent trong Không gian làm việc khép kín của Thầy Võ Việt Khái (giáo viên tiểu học).
 Danh sách 22 trang web & Skill:
 ${linksContext}
 
-Trang hiện tại đang mở: ${activeWorkspaceItem ? activeWorkspaceItem.title + ' (' + activeWorkspaceItem.url + ')' : 'Chưa mở trang nào'}
+Trang hiện tại đang mở trong khung làm việc: ${activeWorkspaceItem ? activeWorkspaceItem.title + ' (' + activeWorkspaceItem.url + ')' : 'Chưa mở trang nào'}
+${syncedAppData ? '\nDữ liệu vừa quét được từ App Vercel:\n' + syncedAppData.slice(0, 2500) : ''}
 
-Nhiệm vụ điều hướng:
-1. Nếu thầy yêu cầu mở một trang web trong danh sách: Chèn lệnh sau ở cuối câu trả lời:
+Nhiệm vụ điều hướng của bạn:
+1. Nếu thầy yêu cầu mở một trang web trong danh sách: Chèn lệnh sau ở cuối câu trả lời để mở trong App:
 [OPEN_WORKSPACE:{"title":"Tên trang","url":"https://..."}]
-2. Nếu thầy yêu cầu "mở thẻ mới", "mở tab ngoài": Chèn lệnh:
+2. Nếu thầy yêu cầu "mở thẻ mới", "mở tab ngoài" cho một trang web: Chèn lệnh sau ở cuối câu trả lời:
 [OPEN_NEW_TAB:{"title":"Tên trang","url":"https://..."}]
-3. Nếu thầy yêu cầu bấm vào một THẺ (Tab), nút bấm, hoặc mục bài học cụ thể (VD: "mở mục 6", "bấm Tiếp theo", "mở thẻ Học tập"): Chèn lệnh:
-[CLICK_ELEMENT:"Tên thẻ hoặc mục cần bấm"]
-4. Nếu thầy yêu cầu AI tự thao tác phức tạp trên bất kỳ trang web nào (VD: "đăng nhập", "nộp giáo án", "tìm và điền thông tin", "làm bài tập"): Chèn lệnh để Browser Use thực thi:
-[BROWSER_TASK:"Mô tả chi tiết thao tác cần làm trên trình duyệt"]`;
+3. Nếu thầy yêu cầu bấm vào một THẺ (Tab), nút bấm, menu hoặc mục bài học cụ thể BÊN TRONG trang web đang mở: Chèn lệnh:
+[CLICK_ELEMENT:"Tên thẻ hoặc nút cần bấm"]`;
 
-      const model = safeGetString('thaykhai_gemini_model', 'gemini-3.8-flash');
+      const model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-2.5-flash';
 
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
@@ -1016,6 +915,7 @@ Nhiệm vụ điều hướng:
         if (data.error) throw new Error(data.error.message || 'Lỗi API');
 
         let replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Chưa nhận được phản hồi.';
+        let actionHtml = '';
 
         const wsMatch = replyText.match(/\[OPEN_WORKSPACE:(\{.*?\})\]/);
         if (wsMatch) {
@@ -1023,7 +923,15 @@ Nhiệm vụ điều hướng:
             const wsObj = JSON.parse(wsMatch[1]);
             replyText = replyText.replace(wsMatch[0], '').trim();
             openUrlInWorkspace(wsObj.title, wsObj.url);
-          } catch (err) {}
+            actionHtml += `
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between bg-blue-50 p-2 rounded-lg gap-2">
+                <span class="text-[11px] font-semibold text-blue-900 truncate">${wsObj.title}</span>
+                <button onclick="openUrlInWorkspace('${wsObj.title.replace(/'/g, "\\'")}', '${wsObj.url}')" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded transition">
+                  <i class="fa-solid fa-desktop mr-1"></i> Mở lại
+                </button>
+              </div>
+            `;
+          } catch (err) { console.error(err); }
         }
 
         const tabMatch = replyText.match(/\[OPEN_NEW_TAB:(\{.*?\})\]/);
@@ -1032,35 +940,22 @@ Nhiệm vụ điều hướng:
             const tabObj = JSON.parse(tabMatch[1]);
             replyText = replyText.replace(tabMatch[0], '').trim();
             window.open(tabObj.url, '_blank');
-          } catch (err) {}
+          } catch (err) { console.error(err); }
         }
 
         const clickMatch = replyText.match(/\[CLICK_ELEMENT:"(.*?)"\]/);
         if (clickMatch) {
           const targetName = clickMatch[1];
           replyText = replyText.replace(clickMatch[0], '').trim();
-          dispatchHybridAction('CLICK_TEXT', targetName);
-        }
-
-        const browserTaskMatch = replyText.match(/\[BROWSER_TASK:"(.*?)"\]/);
-        if (browserTaskMatch) {
-          const taskDesc = browserTaskMatch[1];
-          replyText = replyText.replace(browserTaskMatch[0], '').trim();
-          dispatchHybridAction('AI_TASK', taskDesc).then((res) => {
-            if (res && res.message) {
-              chatBox.innerHTML += `<div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-slate-800 shadow-xs">${marked.parse(res.message)}</div>`;
-              chatBox.scrollTop = chatBox.scrollHeight;
-              speakVietnamese(res.message);
-            }
-          });
+          clickElementInWorkspace(targetName);
         }
 
         chatBox.innerHTML += `
           <div class="bg-white border border-slate-200 p-3 rounded-xl text-xs text-slate-700 shadow-xs prose max-w-none leading-relaxed">
             ${marked.parse(replyText)}
+            ${actionHtml}
           </div>
         `;
-        speakVietnamese(replyText);
       } catch (error) {
         document.getElementById(loadingId)?.remove();
         chatBox.innerHTML += `
@@ -1072,205 +967,10 @@ Nhiệm vụ điều hướng:
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Gắn toàn bộ sự kiện điều khiển
-    document.getElementById('apiStatusBtn').addEventListener('click', openApiModal);
-    document.getElementById('closeApiModalBtn').addEventListener('click', closeApiModal);
-    document.getElementById('cancelApiModalBtn').addEventListener('click', closeApiModal);
-    document.getElementById('saveApiKeyBtn').addEventListener('click', saveApiKey);
-
-    document.getElementById('addLinkBtn').addEventListener('click', () => openModal());
-    document.getElementById('closeLinkModalBtn').addEventListener('click', closeModal);
-    document.getElementById('cancelLinkModalBtn').addEventListener('click', closeModal);
-    document.getElementById('linkForm').addEventListener('submit', saveLink);
-
-    document.getElementById('downloadHtmlBtn').addEventListener('click', downloadCleanIndexHtml);
-    document.getElementById('exportJsonBtn').addEventListener('click', exportJSON);
-    document.getElementById('importJsonInput').addEventListener('change', importJSON);
-    document.getElementById('searchInput').addEventListener('input', renderLinks);
-
-    document.getElementById('btnAutoPlayLesson').addEventListener('click', toggleAutoPlayLesson);
-    document.getElementById('btnForceNextSection').addEventListener('click', forceNextSectionNow);
-    document.getElementById('btnCopyConsoleScript').addEventListener('click', copyDirectConsoleScript);
-
-    document.getElementById('backToDashboardBtn').addEventListener('click', closeWorkspace);
-    document.getElementById('reloadWorkspaceBtn').addEventListener('click', reloadWorkspace);
-    document.getElementById('closeSkillBannerBtn').addEventListener('click', () => {
-      document.getElementById('wsSkillBanner').classList.add('hidden');
-    });
-    document.getElementById('solveQuizOnPageBtn').addEventListener('click', async () => {
-      showToast('Đang nhờ Browser Use đọc và giải bài tập trên Chrome...');
-      const res = await dispatchHybridAction('SOLVE_QUIZ', 'Giải bài tập trên trang hiện tại');
-      if (res && res.message) {
-        const chatBox = document.getElementById('chatBox');
-        chatBox.innerHTML += `<div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-slate-800 shadow-xs">${marked.parse(res.message)}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        speakVietnamese(res.message);
-      } else {
-        sendToExtensionFrame('READ_PAGE_CONTENT');
-      }
-    });
-
-    document.getElementById('timerToggleBtn').addEventListener('click', toggleTimer);
-    document.getElementById('panelTimerBtn').addEventListener('click', toggleTimer);
-    document.getElementById('resetTimerBtn').addEventListener('click', resetTimer);
-
-    document.getElementById('tabRightChat').addEventListener('click', () => switchRightTab('chat'));
-    document.getElementById('tabRightControl').addEventListener('click', () => switchRightTab('control'));
-
-    document.getElementById('clearChatBtn').addEventListener('click', () => {
-      document.getElementById('chatBox').innerHTML = `
-        <div class="bg-blue-50 border border-blue-100 text-slate-700 p-2.5 rounded-xl text-xs">
-          Đã làm mới khung trò chuyện. Sẵn sàng nhận lệnh!
-        </div>
-      `;
-    });
-
-    document.getElementById('chatForm').addEventListener('submit', handleCommand);
-    document.getElementById('agentInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleCommand(e);
-      }
-    });
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => filterCategory(btn.dataset.cat));
-    });
-
-    document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchRightTab('chat');
-        const input = document.getElementById('agentInput');
-        input.value = btn.dataset.prompt;
-        input.focus();
-      });
-    });
-
-    document.getElementById('linksGrid').addEventListener('click', (e) => {
-      const openBtn = e.target.closest('[data-link-open]');
-      if (openBtn) {
-        openInWorkspace(openBtn.dataset.linkOpen);
-        return;
-      }
-      const editBtn = e.target.closest('[data-link-edit]');
-      if (editBtn) {
-        editLink(editBtn.dataset.linkEdit);
-        return;
-      }
-      const delBtn = e.target.closest('[data-link-delete]');
-      if (delBtn) {
-        links = links.filter(l => l.id !== delBtn.dataset.linkDelete);
-        safeSetStorage('thaykhai_links_v3', links);
-        renderLinks();
-        showToast('Đã xóa trang web khỏi danh sách.');
-      }
-    });
-
-    document.getElementById('addTaskForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const input = document.getElementById('newTaskInput');
-      const text = input.value.trim();
-      if (!text) return;
-      tasks.unshift({ id: 't' + Date.now(), text, done: false });
-      safeSetStorage('thaykhai_tasks_v4', tasks);
-      input.value = '';
-      renderTasks();
-    });
-
-    document.getElementById('taskList').addEventListener('click', (e) => {
-      const toggleEl = e.target.closest('[data-task-toggle]');
-      if (toggleEl) {
-        const t = tasks.find(item => item.id === toggleEl.dataset.taskToggle);
-        if (t) t.done = !t.done;
-        safeSetStorage('thaykhai_tasks_v4', tasks);
-        renderTasks();
-        return;
-      }
-      const delEl = e.target.closest('[data-task-delete]');
-      if (delEl) {
-        tasks = tasks.filter(item => item.id !== delEl.dataset.taskDelete);
-        safeSetStorage('thaykhai_tasks_v4', tasks);
-        renderTasks();
-      }
-    });
-
+    // Init
     checkApiStatus();
     renderLinks();
     renderTasks();
-
-    // === HỆ THỐNG TRÒ CHUYỆN & RA LỆNH BẰNG LỜI THOẠI TIẾNG VIỆT ===
-    let voiceReplyEnabled = true;
-    let recognition = null;
-    let isListening = false;
-
-    function speakVietnamese(text) {
-      if (!voiceReplyEnabled || !('speechSynthesis' in window) || !text) return;
-      try {
-        window.speechSynthesis.cancel();
-        const clean = text
-          .replace(/\[.*?\]/g, ' ')
-          .replace(/[*_`#>]/g, ' ')
-          .replace(/https?:\/\/\S+/g, '')
-          .replace(/\s+/g, ' ')
-          .trim()
-          .slice(0, 450);
-        if (!clean) return;
-        const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = 'vi-VN';
-        utter.rate = 1.05;
-        window.speechSynthesis.speak(utter);
-      } catch (e) {}
-    }
-
-    document.getElementById('voiceReplyToggleBtn').addEventListener('click', () => {
-      voiceReplyEnabled = !voiceReplyEnabled;
-      const btn = document.getElementById('voiceReplyToggleBtn');
-      if (voiceReplyEnabled) {
-        btn.className = "text-[11px] bg-emerald-600 text-white border border-emerald-600 px-2 py-1 rounded transition font-medium";
-        btn.innerHTML = '<i class="fa-solid fa-volume-high mr-1"></i>Đọc thoại: Bật';
-      } else {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        btn.className = "text-[11px] bg-white text-slate-600 border border-slate-300 px-2 py-1 rounded transition font-medium";
-        btn.innerHTML = '<i class="fa-solid fa-volume-xmark mr-1"></i>Đọc thoại: Tắt';
-      }
-    });
-
-    document.getElementById('voiceMicBtn').addEventListener('click', () => {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        showToast('Trình duyệt này chưa hỗ trợ nhận diện giọng nói. Thầy hãy dùng Google Chrome nhé!');
-        return;
-      }
-      const micBtn = document.getElementById('voiceMicBtn');
-      if (isListening && recognition) {
-        recognition.stop();
-        return;
-      }
-      recognition = new SpeechRec();
-      recognition.lang = 'vi-VN';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart = () => {
-        isListening = true;
-        micBtn.className = "bg-rose-600 text-white border border-rose-600 px-3 rounded-lg text-sm transition flex items-center justify-center animate-pulse";
-        showToast('Đang nghe lệnh tiếng Việt của thầy...');
-      };
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('agentInput').value = transcript;
-        document.getElementById('chatForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-      };
-      recognition.onerror = () => {
-        showToast('Không nghe rõ giọng nói, thầy bấm micro thử lại nhé!');
-      };
-      recognition.onend = () => {
-        isListening = false;
-        micBtn.className = "bg-slate-100 hover:bg-rose-100 text-slate-700 border border-slate-300 px-3 rounded-lg text-sm transition flex items-center justify-center";
-      };
-      recognition.start();
-    });
-
   </script>
 </body>
 </html>
