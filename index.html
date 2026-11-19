@@ -16,6 +16,17 @@
     .prose ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.45rem; }
     .prose strong { color: #1e3a8a; }
   </style>
+  <style id="photo-ask">
+    .photo-q { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:8px 10px; font-size:12px; color:#475569; }
+    .photo-q b { color:#334155; }
+    .photo-why { font-size:12px; color:#64748b; margin-top:6px; padding:0 4px; }
+    .photo-thumbs { display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap; }
+    .photo-thumbs img { width:84px; height:84px; object-fit:cover; border-radius:10px; border:2px solid #2563eb; }
+    @media (max-width: 1023px) {
+      #photoAskBtn { font-size: 13px !important; padding: 8px 14px !important; border-radius: 999px !important; flex-shrink: 0; white-space: nowrap; }
+      .photo-q, .photo-why { font-size: 13.5px; }
+    }
+  </style>
   <style id="copy-answer">
     .ans-copy { display: flex; justify-content: flex-end; margin-top: 6px; }
     .ans-copy button {
@@ -358,6 +369,10 @@
       <!-- TAB 1: AI AGENT CHAT -->
       <div id="rightPanelChat" class="flex-1 flex flex-col overflow-hidden">
         <div class="px-3 py-2 bg-blue-50/70 border-b border-blue-100 flex flex-wrap gap-1.5 items-center shrink-0">
+          <label id="photoAskBtn" class="text-[11px] bg-blue-700 hover:bg-blue-800 text-white border border-blue-700 px-2 py-1 rounded transition font-semibold cursor-pointer" title="Chụp màn hình câu hỏi trên trang học rồi chọn ảnh, AI đọc câu hỏi và soạn câu trả lời">
+            <i class="fa-solid fa-camera mr-1"></i>Gửi ảnh câu hỏi
+            <input type="file" accept="image/*" multiple hidden onchange="askFromImages(this)" />
+          </label>
           <button onclick="useQuickPrompt('Giải nhanh câu hỏi trắc nghiệm bồi dưỡng thường xuyên sau và giải thích ngắn gọn lý do chọn đáp án:\n')" 
                   class="text-[11px] bg-white hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 px-2 py-1 rounded transition font-medium">
             <i class="fa-solid fa-check-double mr-1"></i>Giải BDTX
@@ -1174,6 +1189,107 @@ Nhiệm vụ điều hướng của bạn:
     checkApiStatus();
     renderLinks();
     renderTasks();
+  </script>
+  <script>
+    // Gửi ảnh chụp câu hỏi: AI đọc câu hỏi trong ảnh và soạn câu trả lời (dùng được trên điện thoại).
+    function photoEsc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+    // Thu nhỏ ảnh trước khi gửi để nhanh và đỡ tốn dung lượng
+    function shrinkImage(file, max = 1600) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          resolve(c.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không mở được ảnh này')); };
+        img.src = url;
+      });
+    }
+
+    async function askFromImages(inputEl) {
+      const files = Array.from(inputEl.files || []).slice(0, 4);
+      inputEl.value = '';
+      if (!files.length) return;
+      const apiKey = localStorage.getItem('thaykhai_gemini_key');
+      if (!apiKey) { alert('Thầy vui lòng bấm nút chìa khóa (API Key) ở góc trên để nhập khóa API trước nhé!'); openApiModal(); return; }
+      if (window.setMobilePane && window.matchMedia('(max-width: 1023px)').matches) setMobilePane('ai');
+      switchRightTab('chat');
+
+      const chatBox = document.getElementById('chatBox');
+      const input = document.getElementById('agentInput');
+      const note = input.value.trim(); input.value = '';
+      const loadId = 'photo-' + Date.now();
+
+      let images;
+      try { images = await Promise.all(files.map((f) => shrinkImage(f))); }
+      catch (err) { chatBox.insertAdjacentHTML('beforeend', `<div class="bg-red-50 text-red-700 p-2.5 rounded-xl text-xs">${photoEsc(err.message)}</div>`); return; }
+
+      chatBox.insertAdjacentHTML('beforeend', `
+        <div class="flex flex-col items-end gap-1.5">
+          <div class="photo-thumbs">${images.map((d) => `<img src="${d}" alt="Ảnh câu hỏi">`).join('')}</div>
+          ${note ? `<div class="bg-blue-600 text-white px-3 py-2 rounded-xl text-xs max-w-[85%] whitespace-pre-wrap">${photoEsc(note)}</div>` : ''}
+        </div>
+        <div id="${loadId}" class="bg-white border border-slate-200 p-2.5 rounded-xl text-xs text-slate-500 flex items-center gap-2 w-fit">
+          <i class="fa-solid fa-circle-notch fa-spin text-blue-600"></i> Đang đọc câu hỏi trong ảnh...
+        </div>`);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const prompt = `Ảnh là ảnh chụp màn hình một câu hỏi bài tập trong khóa bồi dưỡng thường xuyên của giáo viên tiểu học.
+Người làm bài: Thầy Võ Việt Khái, tổ trưởng chuyên môn khối 4, trường tiểu học ở TP.HCM.${note ? '\nThầy dặn thêm: ' + note : ''}
+Việc cần làm:
+1. Chép lại đúng nguyên văn câu hỏi trong ảnh (kèm các phương án nếu là trắc nghiệm). Nếu có nhiều câu, chép đủ từng câu.
+2. Soạn phần trả lời:
+   - Trắc nghiệm: ghi phương án đúng (chữ cái và nội dung phương án). Nhiều câu thì ghi lần lượt "Câu 1: ...".
+   - Tự luận: viết câu trả lời hoàn chỉnh để dán thẳng vào ô trả lời. Viết tự nhiên như giáo viên thật, câu ngắn gọn, đúng thực tế trường tiểu học, không mở đầu bằng lời chào, không nhắc tới AI.
+3. Giải thích ngắn 1–2 câu vì sao chọn như vậy.
+Nếu ảnh mờ hoặc không thấy câu hỏi, nói rõ phần nào không đọc được.
+Trả lời ĐÚNG theo khuôn sau, không thêm gì khác:
+===CÂU HỎI===
+(nội dung câu hỏi)
+===TRẢ LỜI===
+(phần trả lời để chọn hoặc dán)
+===GIẢI THÍCH===
+(giải thích ngắn)`;
+
+      let model = localStorage.getItem('thaykhai_gemini_model') || 'gemini-3.8-flash';
+      if (!model.includes('3.8')) model = 'gemini-3.8-flash';
+
+      try {
+        const parts = images.map((d) => ({ inline_data: { mime_type: 'image/jpeg', data: d.split(',')[1] } }));
+        parts.push({ text: prompt });
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ role: 'user', parts }] })
+        });
+        const data = await res.json();
+        document.getElementById(loadId)?.remove();
+        if (data.error) throw new Error(data.error.message || 'Lỗi API');
+        const raw = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('').trim() || 'Chưa nhận được phản hồi.';
+
+        const pick = (tag, next) => {
+          const re = new RegExp('===' + tag + '===\\s*([\\s\\S]*?)' + (next ? '\\s*===' + next + '===' : '\\s*$'));
+          const m = raw.match(re); return m ? m[1].trim() : '';
+        };
+        const q = pick('CÂU HỎI', 'TRẢ LỜI'), a = pick('TRẢ LỜI', 'GIẢI THÍCH'), why = pick('GIẢI THÍCH');
+
+        let html = '<div class="space-y-1.5">';
+        if (q) html += `<div class="photo-q"><b>AI đọc được câu hỏi:</b><div class="whitespace-pre-wrap mt-0.5">${photoEsc(q)}</div></div>`;
+        html += `<div class="bg-white border border-slate-200 p-3 rounded-xl text-xs text-slate-700 shadow-xs prose max-w-none leading-relaxed">${marked.parse(a || raw)}</div>`;
+        if (why && a) html += `<div class="photo-why"><i class="fa-regular fa-lightbulb mr-1"></i>${photoEsc(why)}</div>`;
+        html += '</div>';
+        chatBox.insertAdjacentHTML('beforeend', html);
+      } catch (err) {
+        document.getElementById(loadId)?.remove();
+        chatBox.insertAdjacentHTML('beforeend', `<div class="bg-red-50 text-red-700 p-2.5 rounded-xl text-xs">Lỗi đọc ảnh: ${photoEsc(err.message)}</div>`);
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
   </script>
   <script>
     // Nút "Sao chép" dưới mỗi câu trả lời của AI: chép chữ thuần để dán vào ô trả lời bài tập.
