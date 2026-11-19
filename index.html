@@ -2,7 +2,8 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Không Gian Làm Việc Khép Kín & AI Agent - Thầy Khái (v13.1)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -14,6 +15,194 @@
     .prose p { margin-bottom: 0.45rem; }
     .prose ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.45rem; }
     .prose strong { color: #1e3a8a; }
+  </style>
+  <!-- ===== GIAO DIỆN ĐIỆN THOẠI (chỉ áp dụng khi màn hình hẹp dưới 1024px; máy tính giữ nguyên) ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" />
+  <style id="mobile-ui">
+    #mobileNav { display: none; }
+    @media (max-width: 1023px) {
+      :root {
+        --m-ink: #1e3a8a;        /* xanh mực: thanh trên, chữ nhấn */
+        --m-ink-2: #2747a8;
+        --m-paper: #ffffff;
+        --m-desk: #eef2f7;       /* nền bàn làm việc */
+        --m-line: #d9e0ea;
+        --m-mute: #64748b;
+        --m-go: #0f9f6e;         /* xanh lá: hành động chính */
+        --m-nav-h: 60px;
+      }
+      html, body { height: 100%; }
+      body {
+        height: 100dvh !important;
+        font-family: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+        background: var(--m-desk);
+        -webkit-font-smoothing: antialiased;
+      }
+      button, a, label, select { touch-action: manipulation; }
+      :focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
+
+      /* ---------- Thanh trên ---------- */
+      body > header {
+        padding: calc(env(safe-area-inset-top) + 8px) 12px 8px !important;
+        gap: 8px;
+        background: var(--m-ink) !important;
+        box-shadow: none !important;
+      }
+      body > header > div:first-child { min-width: 0; flex: 1; gap: 10px; }
+      body > header > div:first-child > div:last-child { min-width: 0; }
+      body > header h1 {
+        font-size: 15px !important; font-weight: 700; letter-spacing: -0.01em;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      body > header h1 + span, body > header p { display: none; }
+      body > header > div:last-child { gap: 6px; flex-shrink: 0; }
+      body > header > div:last-child > button,
+      body > header > div:last-child > label {
+        width: 38px; height: 38px; padding: 0 !important; justify-content: center;
+        border-radius: 10px; font-size: 0 !important;
+      }
+      body > header > div:last-child > button i { font-size: 16px; }
+      body > header > div:last-child > button > span,
+      body > header > div:last-child > label > span { display: none !important; }
+      /* Nhập/Xuất JSON ít dùng trên điện thoại: dời vào màn Tiến độ */
+      body > header > div:last-child > label,
+      body > header > div:last-child > button[onclick="exportJSON()"] { display: none !important; }
+
+      /* ---------- Khung chính: mỗi lần hiện một màn ---------- */
+      #mainArea { position: relative; }
+      #leftPane, #rightPane {
+        position: absolute !important; inset: 0 0 calc(var(--m-nav-h) + env(safe-area-inset-bottom)) 0;
+        width: 100% !important; border: 0 !important;
+      }
+      /* Màn ẩn vẫn giữ trang web chạy (video, tự chuyển bài) nên dùng visibility, không dùng display:none */
+      body:not([data-mpane="web"]) #leftPane { visibility: hidden; pointer-events: none; }
+      body[data-mpane="web"] #rightPane { visibility: hidden; pointer-events: none; }
+      #paneSplitter { display: none !important; }
+      #rightPane > div:first-child { display: none !important; } /* thanh tab cũ, đã có thanh dưới */
+
+      /* ---------- Danh sách trang ---------- */
+      #dashboardView { padding: 12px 12px 0 !important; }
+      #dashboardView > div:first-child { flex-direction: column-reverse; align-items: stretch !important; gap: 10px !important; margin-bottom: 10px !important; }
+      #category-tabs {
+        flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none;
+        margin: 0 -12px; padding: 0 12px 2px; gap: 6px !important;
+      }
+      #category-tabs::-webkit-scrollbar { display: none; }
+      #category-tabs .tab-btn { white-space: nowrap; padding: 8px 14px !important; font-size: 13px !important; }
+      #searchInput { font-size: 16px !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 36px !important; border-radius: 12px !important; }
+      #dashboardView .fa-magnifying-glass { top: 15px !important; left: 14px !important; }
+      #linksGrid { gap: 10px !important; padding: 0 0 16px !important; }
+      #linksGrid > div { padding: 14px !important; border-radius: 14px !important; box-shadow: 0 1px 0 var(--m-line); }
+      #linksGrid h3 { font-size: 15px !important; line-height: 1.35; -webkit-line-clamp: 2; }
+      #linksGrid p { font-size: 13px !important; min-height: 0 !important; }
+      #linksGrid button[onclick^="editLink"], #linksGrid button[onclick^="deleteLink"] { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+      #linksGrid button[onclick^="editLink"] i, #linksGrid button[onclick^="deleteLink"] i { font-size: 14px !important; }
+      #linksGrid button[onclick^="openInWorkspace"] { font-size: 14px !important; padding: 11px 12px !important; border-radius: 11px !important; background: var(--m-ink) !important; }
+      #linksGrid a[target="_blank"] { padding: 11px 14px !important; border-radius: 11px !important; font-size: 14px !important; }
+
+      /* ---------- Trang đang mở ---------- */
+      #workspaceView > div:first-child {
+        display: grid !important; grid-template-columns: 1fr; gap: 8px !important;
+        padding: 8px 10px !important; background: #16233f !important;
+      }
+      #workspaceView > div:first-child > div:first-child .truncate { max-width: none !important; flex: 1; min-width: 0; }
+      #workspaceView > div:first-child > div:first-child button { height: 36px; padding: 0 12px !important; font-size: 13px !important; border-radius: 10px !important; }
+      #wsTitle { font-size: 13px !important; }
+      #wsUrl { font-size: 11px !important; }
+      /* Dải nút hành động: vuốt ngang */
+      #workspaceView > div:first-child > div:last-child {
+        flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none;
+        margin: 0 -10px; padding: 0 10px 2px; gap: 6px !important;
+        -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
+                mask-image: linear-gradient(90deg, #000 88%, transparent);
+      }
+      #workspaceView > div:first-child > div:last-child::-webkit-scrollbar { display: none; }
+      #workspaceView > div:first-child > div:last-child > * {
+        flex-shrink: 0; white-space: nowrap; height: 36px; font-size: 13px !important;
+        border-radius: 999px !important; padding-left: 12px !important; padding-right: 12px !important; box-shadow: none !important;
+      }
+      #speedSelect { font-size: 13px !important; }
+      #wsSkillBanner { font-size: 12.5px !important; padding: 8px 12px !important; }
+      #wsSkillText { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+      /* ---------- Trợ lý AI ---------- */
+      #rightPanelChat > div:first-child {
+        flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; padding: 10px 12px !important; gap: 6px !important;
+        background: var(--m-paper) !important;
+      }
+      #rightPanelChat > div:first-child::-webkit-scrollbar { display: none; }
+      #rightPanelChat > div:first-child > button { flex-shrink: 0; white-space: nowrap; font-size: 13px !important; padding: 8px 12px !important; border-radius: 999px !important; }
+      #chatBox { padding: 14px 12px !important; font-size: 14px; background: var(--m-desk) !important; }
+      #chatBox .text-xs { font-size: 13.5px !important; line-height: 1.6 !important; }
+      #chatBox .text-\[11px\] { font-size: 12.5px !important; }
+      #chatBox .max-w-\[85\%\] { max-width: 90% !important; }
+      #rightPanelChat > div:last-child { padding: 8px 10px calc(8px) !important; }
+      #agentInput { font-size: 16px !important; border-radius: 14px !important; padding: 10px 12px !important; min-height: 46px; }
+      #rightPanelChat form button[type="submit"] { width: 46px; height: 46px; align-self: flex-end; border-radius: 14px !important; background: var(--m-ink) !important; }
+
+      /* ---------- Tiến độ ---------- */
+      #rightPanelControl { padding: 12px !important; background: var(--m-desk) !important; }
+      #panelTimerDisplay { font-size: 22px !important; }
+      #panelTimerBtn { padding: 10px 14px !important; font-size: 13px !important; border-radius: 11px !important; }
+      #newTaskInput { font-size: 16px !important; padding: 11px 12px !important; border-radius: 12px !important; }
+      #rightPanelControl form button { width: 46px; border-radius: 12px !important; }
+      #taskList { font-size: 14px; }
+      #mBackup { display: flex; gap: 8px; margin-top: 12px; flex-shrink: 0; }
+      #mBackup > * { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px;
+        border: 1px solid var(--m-line); background: var(--m-paper); color: #334155; border-radius: 11px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+      /* ---------- Thanh điều hướng dưới ---------- */
+      #mobileNav {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+        height: calc(var(--m-nav-h) + env(safe-area-inset-bottom));
+        padding: 6px 10px env(safe-area-inset-bottom);
+        background: var(--m-paper); border-top: 1px solid var(--m-line);
+      }
+      #mobileNav button {
+        position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        color: var(--m-mute); font-size: 11.5px; font-weight: 600; border-radius: 14px;
+        transition: color .15s, background-color .15s;
+      }
+      #mobileNav button i { font-size: 18px; }
+      #mobileNav button[aria-current="page"] { color: var(--m-ink); background: #e6ecf8; }
+      #mobileNav .m-badge {
+        position: absolute; top: 4px; left: calc(50% + 8px);
+        min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+        background: var(--m-ink); color: #fff; font-size: 10.5px; line-height: 18px; text-align: center;
+      }
+      #mobileNav .m-dot {
+        position: absolute; top: 6px; left: calc(50% + 10px); width: 9px; height: 9px; border-radius: 50%;
+        background: #ef4444; border: 2px solid var(--m-paper); display: none;
+      }
+      #mobileNav .m-dot.on { display: block; }
+
+      /* ---------- Hộp thoại: trượt lên từ dưới ---------- */
+      #profileModal, #apiModal, #linkModal { align-items: flex-end !important; padding: 0 !important; }
+      #profileModal > div, #apiModal > div, #linkModal > div {
+        max-width: none !important; border-radius: 20px 20px 0 0 !important;
+        max-height: 92dvh; display: flex; flex-direction: column;
+        padding-bottom: env(safe-area-inset-bottom);
+        animation: mSheet .22s ease-out;
+      }
+      #profileModal > div > div:nth-child(2) { max-height: none !important; flex: 1; }
+      #linkModal form, #apiModal > div > div:last-child { overflow-y: auto; }
+      #profileModal input, #profileModal select, #profileModal textarea,
+      #apiModal input, #apiModal select, #linkModal input, #linkModal select, #linkModal textarea { font-size: 16px !important; }
+      #profileModal button, #apiModal button, #linkModal button { min-height: 40px; }
+      @keyframes mSheet { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+    }
+    @media (max-width: 520px) {
+      #profileModal .grid-cols-2, #profileModal .grid-cols-3 { grid-template-columns: 1fr !important; }
+      #profileModal .col-span-2 { grid-column: auto !important; }
+      #profileModal > div > div:nth-child(2) > div:first-child { flex-wrap: wrap; }
+      #profileModal > div > div:nth-child(2) > div:first-child > label { flex-basis: 100%; }
+    }
+    @media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+      #profileModal > div, #apiModal > div, #linkModal > div { animation: none; }
+      #mobileNav button { transition: none; }
+    }
   </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800">
@@ -67,10 +256,10 @@
   </header>
 
   <!-- Main Workspace Area -->
-  <div class="flex-1 flex overflow-hidden">
+  <div id="mainArea" class="flex-1 flex overflow-hidden">
     
     <!-- LEFT PANEL (65%): Dashboard OR Embedded Web Workspace -->
-    <main class="w-full lg:w-[65%] flex flex-col overflow-hidden bg-slate-100 relative">
+    <main id="leftPane" class="w-full lg:w-[65%] flex flex-col overflow-hidden bg-slate-100 relative">
       
       <!-- MODE 1: Dashboard Grid View -->
       <div id="dashboardView" class="flex-1 flex flex-col p-4 overflow-hidden">
@@ -143,7 +332,7 @@
     </main>
 
     <!-- RIGHT PANEL (35%): AI Agent & Work/Study Control Center -->
-    <aside class="w-full lg:w-[35%] bg-white border-l border-slate-200 flex flex-col">
+    <aside id="rightPane" class="w-full lg:w-[35%] bg-white border-l border-slate-200 flex flex-col">
       <div class="flex border-b border-slate-200 bg-slate-50 shrink-0">
         <button onclick="switchRightTab('chat')" id="tabRightChat" class="flex-1 py-2.5 text-xs font-bold text-blue-700 border-b-2 border-blue-600 bg-white flex items-center justify-center gap-1.5">
           <span id="agentDot" class="w-2 h-2 rounded-full bg-amber-500"></span> Trợ lý AI Agent
@@ -972,6 +1161,91 @@ Nhiệm vụ điều hướng của bạn:
     checkApiStatus();
     renderLinks();
     renderTasks();
+  </script>
+  <!-- ===== Thanh điều hướng dưới cho điện thoại ===== -->
+  <nav id="mobileNav" aria-label="Chuyển màn hình">
+    <button type="button" data-go="web" aria-current="page"><i class="fa-solid fa-globe"></i><span>Trang web</span></button>
+    <button type="button" data-go="ai"><i class="fa-solid fa-robot"></i><span>Trợ lý AI</span><span class="m-dot" id="mChatDot"></span></button>
+    <button type="button" data-go="tasks"><i class="fa-solid fa-list-check"></i><span>Tiến độ</span><span class="m-badge" id="mTaskBadge" hidden>0</span></button>
+  </nav>
+  <script>
+    // Giao diện điện thoại: mỗi lần hiện một màn (Trang web / Trợ lý AI / Tiến độ). Máy tính không bị ảnh hưởng.
+    (function mobileUI() {
+      const mq = window.matchMedia('(max-width: 1023px)');
+      const nav = document.getElementById('mobileNav');
+      const dot = document.getElementById('mChatDot');
+      const badge = document.getElementById('mTaskBadge');
+      let pane = 'web';
+
+      function setPane(p) {
+        pane = p;
+        document.body.dataset.mpane = p;
+        nav.querySelectorAll('button').forEach((b) => {
+          if (b.dataset.go === p) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+        });
+        if (p === 'ai') dot.classList.remove('on');
+      }
+      window.setMobilePane = setPane;
+
+      nav.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-go]');
+        if (!b) return;
+        const p = b.dataset.go;
+        if (p === 'ai') switchRightTab('chat');
+        if (p === 'tasks') switchRightTab('control');
+        setPane(p);
+        if (p === 'ai') { const box = document.getElementById('chatBox'); box.scrollTop = box.scrollHeight; }
+      });
+
+      // Mở trang -> hiện màn Trang web
+      ['openInWorkspace', 'openUrlInWorkspace', 'closeWorkspace'].forEach((name) => {
+        const fn = window[name];
+        if (typeof fn !== 'function') return;
+        window[name] = function () { const r = fn.apply(this, arguments); if (mq.matches) setPane('web'); return r; };
+      });
+
+      // Các nút cần đọc kết quả trong khung chat -> hiện màn Trợ lý AI.
+      // Riêng Chạy Skill thì giữ nguyên màn trang web để thầy xem trang đang chạy.
+      ['syncDataFromVercelApp', 'generateWeeklyReport', 'useQuickPrompt'].forEach((name) => {
+        const fn = window[name];
+        if (typeof fn !== 'function') return;
+        window[name] = function () { if (mq.matches) setPane('ai'); return fn.apply(this, arguments); };
+      });
+
+      // Có tin mới trong chat khi đang ở màn khác -> chấm đỏ trên nút Trợ lý AI
+      new MutationObserver(() => { if (pane !== 'ai') dot.classList.add('on'); })
+        .observe(document.getElementById('chatBox'), { childList: true });
+
+      // Số đầu việc trên nút Tiến độ
+      const counter = document.getElementById('taskCounter');
+      const syncBadge = () => { const n = parseInt(counter.textContent, 10) || 0; badge.textContent = n; badge.hidden = n === 0; };
+      new MutationObserver(syncBadge).observe(counter, { childList: true, characterData: true, subtree: true });
+      syncBadge();
+
+      // Nhập/Xuất JSON: trên điện thoại đặt ở cuối màn Tiến độ
+      const ctrl = document.getElementById('rightPanelControl');
+      const backup = document.createElement('div');
+      backup.id = 'mBackup';
+      backup.hidden = !mq.matches;
+      backup.innerHTML = '<label><i class="fa-solid fa-file-import"></i> Nhập danh sách<input type="file" accept=".json" hidden></label>'
+        + '<button type="button"><i class="fa-solid fa-download"></i> Sao lưu danh sách</button>';
+      backup.querySelector('input').addEventListener('change', (e) => importJSON(e));
+      backup.querySelector('button').addEventListener('click', () => exportJSON());
+      ctrl.appendChild(backup);
+
+      // Khi đổi giữa điện thoại và máy tính (xoay màn, kéo cửa sổ)
+      const apply = () => {
+        backup.hidden = !mq.matches;
+        if (mq.matches) {
+          document.getElementById('rightPane').style.width = ''; // bỏ độ rộng kéo tay của máy tính
+          setPane(pane);
+        } else {
+          delete document.body.dataset.mpane;
+        }
+      };
+      mq.addEventListener ? mq.addEventListener('change', apply) : mq.addListener(apply);
+      apply();
+    })();
   </script>
 </body>
 </html>
